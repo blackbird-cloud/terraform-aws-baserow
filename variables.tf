@@ -29,7 +29,7 @@ variable "az_count" {
 variable "public_subnet_cidrs" {
   description = "List of public subnet CIDRs (one per AZ)"
   type        = list(string)
-  default     = [
+  default = [
     "10.10.0.0/24",
     "10.10.1.0/24"
   ]
@@ -38,7 +38,7 @@ variable "public_subnet_cidrs" {
 variable "private_subnet_cidrs" {
   description = "List of private subnet CIDRs (one per AZ)"
   type        = list(string)
-  default     = [
+  default = [
     "10.10.10.0/24",
     "10.10.11.0/24"
   ]
@@ -47,7 +47,7 @@ variable "private_subnet_cidrs" {
 variable "database_subnet_cidrs" {
   description = "List of database subnet CIDRs (one per AZ)"
   type        = list(string)
-  default     = [
+  default = [
     "10.10.20.0/24",
     "10.10.21.0/24"
   ]
@@ -56,7 +56,7 @@ variable "database_subnet_cidrs" {
 variable "elasticache_subnet_cidrs" {
   description = "List of elasticache subnet CIDRs (one per AZ)"
   type        = list(string)
-  default     = [
+  default = [
     "10.10.30.0/24",
     "10.10.31.0/24"
   ]
@@ -65,7 +65,7 @@ variable "elasticache_subnet_cidrs" {
 variable "eks_cluster_version" {
   description = "EKS cluster version"
   type        = string
-  default     = "1.30"
+  default     = "1.33"
 }
 
 variable "eks_node_instance_types" {
@@ -83,13 +83,13 @@ variable "eks_node_desired_size" {
 variable "db_engine_version" {
   description = "Aurora PostgreSQL engine version"
   type        = string
-  default     = "15.4"
+  default     = "17.5"
 }
 
 variable "db_instance_class" {
   description = "DB instance class"
   type        = string
-  default     = "db.r6g.large"
+  default     = "db.t4g.medium"
 }
 
 variable "db_min_capacity" {
@@ -126,14 +126,14 @@ variable "valkey_node_type" {
 variable "valkey_num_cache_nodes" {
   description = "Number of Valkey cache nodes (for cluster mode disabled)"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "tags" {
   description = "Common tags"
   type        = map(string)
   default = {
-    Project = "baserow"
+    Project   = "baserow"
     Terraform = "true"
   }
 }

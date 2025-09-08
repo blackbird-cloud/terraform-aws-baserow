@@ -1,0 +1,139 @@
+############################################################
+# Variables
+############################################################
+
+variable "name" {
+  description = "Base name/prefix for all resources"
+  type        = string
+  default     = "baserow"
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-central-1"
+}
+
+variable "vpc_cidr" {
+  description = "VPC CIDR block"
+  type        = string
+  default     = "10.10.0.0/16"
+}
+
+variable "az_count" {
+  description = "Number of AZs to use"
+  type        = number
+  default     = 2
+}
+
+variable "public_subnet_cidrs" {
+  description = "List of public subnet CIDRs (one per AZ)"
+  type        = list(string)
+  default     = [
+    "10.10.0.0/24",
+    "10.10.1.0/24"
+  ]
+}
+
+variable "private_subnet_cidrs" {
+  description = "List of private subnet CIDRs (one per AZ)"
+  type        = list(string)
+  default     = [
+    "10.10.10.0/24",
+    "10.10.11.0/24"
+  ]
+}
+
+variable "database_subnet_cidrs" {
+  description = "List of database subnet CIDRs (one per AZ)"
+  type        = list(string)
+  default     = [
+    "10.10.20.0/24",
+    "10.10.21.0/24"
+  ]
+}
+
+variable "elasticache_subnet_cidrs" {
+  description = "List of elasticache subnet CIDRs (one per AZ)"
+  type        = list(string)
+  default     = [
+    "10.10.30.0/24",
+    "10.10.31.0/24"
+  ]
+}
+
+variable "eks_cluster_version" {
+  description = "EKS cluster version"
+  type        = string
+  default     = "1.30"
+}
+
+variable "eks_node_instance_types" {
+  description = "Instance types for EKS managed node group"
+  type        = list(string)
+  default     = ["t3.large"]
+}
+
+variable "eks_node_desired_size" {
+  description = "Desired node count"
+  type        = number
+  default     = 2
+}
+
+variable "db_engine_version" {
+  description = "Aurora PostgreSQL engine version"
+  type        = string
+  default     = "15.4"
+}
+
+variable "db_instance_class" {
+  description = "DB instance class"
+  type        = string
+  default     = "db.r6g.large"
+}
+
+variable "db_min_capacity" {
+  description = "Minimum ACU for Aurora Serverless v2 (if used)"
+  type        = number
+  default     = 0.5
+}
+
+variable "db_max_capacity" {
+  description = "Maximum ACU for Aurora Serverless v2 (if used)"
+  type        = number
+  default     = 4
+}
+
+variable "db_password" {
+  description = "Master DB password (provide via TF_VAR_db_password)"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "db_username" {
+  description = "Master DB username"
+  type        = string
+  default     = "baserow"
+}
+
+variable "valkey_node_type" {
+  description = "Valkey / ElastiCache node type"
+  type        = string
+  default     = "cache.t4g.small"
+}
+
+variable "valkey_num_cache_nodes" {
+  description = "Number of Valkey cache nodes (for cluster mode disabled)"
+  type        = number
+  default     = 1
+}
+
+variable "tags" {
+  description = "Common tags"
+  type        = map(string)
+  default = {
+    Project = "baserow"
+    Terraform = "true"
+  }
+}

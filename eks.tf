@@ -9,6 +9,21 @@ module "eks" {
   name               = var.name
   kubernetes_version = var.eks_cluster_version
 
+  addons = {
+    coredns    = {}
+    kube-proxy = {}
+    vpc-cni = {
+      before_compute = true
+    }
+    eks-pod-identity-agent = {
+      before_compute = true
+    }
+  }
+
+  compute_config = {
+    enabled = false
+  }
+
   endpoint_public_access   = true
   vpc_id                   = module.vpc.vpc_id
   control_plane_subnet_ids = module.vpc.public_subnets
@@ -17,9 +32,13 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
-  compute_config = {
-    enabled    = true
-    node_pools = ["general-purpose"]
+  eks_managed_node_groups = {
+    stable = {
+      min_size       = var.eks_node_min_size
+      max_size       = var.eks_node_max_size
+      desired_size   = var.eks_node_desired_size
+      instance_types = var.eks_node_instance_types
+    }
   }
 
   create_node_security_group = true

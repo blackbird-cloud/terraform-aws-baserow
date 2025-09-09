@@ -22,5 +22,17 @@ module "eks" {
     node_pools = ["general-purpose"]
   }
 
+  create_node_security_group = true
+  node_security_group_additional_rules = {
+    ingress-all = {
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Allow incoming traffic from anywhere"
+      from_port   = 1025
+      to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+    }
+  }
+
   tags = var.tags
 }

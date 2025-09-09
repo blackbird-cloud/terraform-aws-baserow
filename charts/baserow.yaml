@@ -1,0 +1,50 @@
+global:
+  baserow:
+    domain: "your-baserow-domain.com"
+    backendDomain: "api.your-baserow-domain.com"
+    objectsDomain: "objects.your-baserow-domain.com"
+    serviceAccount:
+        shared: true
+        create: true
+        name: baserow
+        annotations: {
+          "eks.amazonaws.com/role-arn": "${eks_role_arn}"
+        }
+
+backendSecrets:
+  DATABASE_HOST: "${database_host}"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "baserow"
+  DATABASE_USER: "baserow"
+  DATABASE_PASSWORD: "${database_password}"
+  REDIS_HOST: "${redis_host}"
+  REDIS_PORT: "6379"
+  REDIS_USER: "default"
+  REDIS_PASSWORD: "baserow"
+
+backendConfigMap:
+  AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
+  AWS_S3_CUSTOM_DOMAIN: "${s3_bucket_name}"
+  AWS_S3_REGION_NAME: "${s3_region_name}"
+  AWS_S3_ENDPOINT_URL: "${s3_endpoint_url}"
+
+ingress:
+  enabled: true
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "TCP"
+    service.beta.kubernetes.io/aws-load-balancer-alpn-policy: "HTTP2Preferred"
+
+redis:
+  enabled: false
+
+postgresql:
+  enabled: false
+
+minio:
+  enabled: false
+
+caddy:
+  enabled: false

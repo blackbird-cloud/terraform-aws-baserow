@@ -5,5 +5,5 @@
 # Get available AZs in the region
 data "aws_availability_zones" "available" {}
 
-# KMS key for RDS encryption
+# Get current AWS account info
 data "aws_caller_identity" "current" {}

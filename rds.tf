@@ -62,15 +62,6 @@ module "aurora" {
   tags                = var.tags
 }
 
-resource "random_password" "db" {
-  length  = 20
-  special = false
-}
-
-locals {
-  db_password_final = coalesce(try(var.db_password, null), random_password.db.result)
-}
-
 resource "aws_kms_key" "rds" {
   description             = "KMS key for RDS Aurora cluster encryption"
   enable_key_rotation     = true

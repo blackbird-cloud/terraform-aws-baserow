@@ -68,17 +68,17 @@ variable "eks_cluster_version" {
   default     = "1.33"
 }
 
-variable "eks_node_instance_types" {
-  description = "Instance types for EKS managed node group"
-  type        = list(string)
-  default     = ["t3.large"]
-}
+# variable "eks_node_instance_types" {
+#   description = "Instance types for EKS managed node group"
+#   type        = list(string)
+#   default     = ["t3.large"]
+# }
 
-variable "eks_node_desired_size" {
-  description = "Desired node count"
-  type        = number
-  default     = 2
-}
+# variable "eks_node_desired_size" {
+#   description = "Desired node count"
+#   type        = number
+#   default     = 2
+# }
 
 variable "db_engine_version" {
   description = "Aurora PostgreSQL engine version"
@@ -92,24 +92,12 @@ variable "db_instance_class" {
   default     = "db.t4g.medium"
 }
 
-variable "db_min_capacity" {
-  description = "Minimum ACU for Aurora Serverless v2 (if used)"
-  type        = number
-  default     = 0.5
-}
-
-variable "db_max_capacity" {
-  description = "Maximum ACU for Aurora Serverless v2 (if used)"
-  type        = number
-  default     = 4
-}
-
-variable "db_password" {
-  description = "Master DB password (provide via TF_VAR_db_password)"
-  type        = string
-  sensitive   = true
-  default     = null
-}
+# variable "db_password" {
+#   description = "Master DB password (provide via TF_VAR_db_password)"
+#   type        = string
+#   sensitive   = true
+#   default     = null
+# }
 
 variable "db_username" {
   description = "Master DB username"

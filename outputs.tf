@@ -1,12 +1,45 @@
-output "vpc_id" { value = module.vpc.vpc_id }
-output "private_subnets" { value = module.vpc.private_subnets }
-output "public_subnets" { value = module.vpc.public_subnets }
-output "database_subnets" { value = module.vpc.database_subnets }
-output "elasticache_subnets" { value = module.vpc.elasticache_subnets }
+##############################################
+# VPC
+##############################################
+output "vpc_id" {
+  value       = module.vpc.vpc_id
+  description = "The ID of the VPC."
+}
 
-output "aurora_endpoint" { value = module.aurora.cluster_endpoint }
-output "aurora_reader_endpoint" { value = module.aurora.cluster_reader_endpoint }
-output "aurora_security_group_id" { value = module.aurora.security_group_id }
+output "private_subnets" {
+  value       = module.vpc.private_subnets
+  description = "List of private subnet IDs."
+}
+
+output "public_subnets" {
+  value       = module.vpc.public_subnets
+  description = "List of public subnet IDs."
+}
+
+output "database_subnets" {
+  value       = module.vpc.database_subnets
+  description = "List of database subnet IDs."
+}
+
+output "elasticache_subnets" {
+  value       = module.vpc.elasticache_subnets
+  description = "List of ElastiCache subnet IDs."
+}
+
+output "aurora_endpoint" {
+  value       = module.aurora.cluster_endpoint
+  description = "The Aurora cluster primary endpoint."
+}
+
+output "aurora_reader_endpoint" {
+  value       = module.aurora.cluster_reader_endpoint
+  description = "The Aurora cluster reader endpoint."
+}
+
+output "aurora_security_group_id" {
+  value       = module.aurora.security_group_id
+  description = "The security group ID for the Aurora cluster."
+}
 
 output "s3_bucket_name" {
   value       = module.s3_bucket.s3_bucket_id

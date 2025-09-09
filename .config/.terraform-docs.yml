@@ -1,0 +1,40 @@
+formatter: "markdown"
+
+header-from: ./.config/header.md
+footer-from: ./.config/footer.md
+
+output:
+  file: ./README.md
+  mode: replace
+  template: |-
+    {{ .Content }}
+
+sections:
+  hide:
+    - modules
+
+content: |-
+  {{ include "./.config/title.md"}}
+
+  {{ .Header }}
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  ## Running Costs
+  ```
+  {{ include "./costs.md" }}
+  ```
+  Update with
+  ```sh
+  infracost breakdown --format=table --no-color --path . --out-file=costs.md
+  ```
+
+  {{ .Footer }}

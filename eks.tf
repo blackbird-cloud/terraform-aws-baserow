@@ -18,10 +18,9 @@ module "eks" {
     eks-pod-identity-agent = {
       before_compute = true
     }
-  }
-
-  compute_config = {
-    enabled = false
+    aws-ebs-csi-driver = {
+      before_compute = true
+    }
   }
 
   endpoint_public_access   = true
@@ -48,6 +47,14 @@ module "eks" {
       description = "Allow incoming traffic from anywhere"
       from_port   = 1025
       to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+    }
+    https-all = {
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Allow incoming HTTPS traffic from anywhere"
+      from_port   = 443
+      to_port     = 443
       protocol    = "tcp"
       type        = "ingress"
     }

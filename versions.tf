@@ -1,6 +1,6 @@
 
 terraform {
-  required_version = ">= 1.0.0"
+  required_version = ">= 1.13.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -9,10 +9,6 @@ terraform {
     helm = {
       source  = "hashicorp/helm"
       version = "~> 3.0"
-    }
-    postgresql = {
-      source  = "cyrilgdn/postgresql"
-      version = "~> 1.0"
     }
     random = {
       source  = "hashicorp/random"

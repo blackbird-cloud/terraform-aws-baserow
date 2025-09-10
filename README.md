@@ -19,10 +19,9 @@ The module can be configured using the following variables:
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.13.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | ~> 3.0 |
-| <a name="requirement_postgresql"></a> [postgresql](#requirement\_postgresql) | ~> 1.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6 |
 
 ## Providers
@@ -37,11 +36,15 @@ The module can be configured using the following variables:
 | Name | Type |
 |------|------|
 | [aws_iam_policy.baserow_backend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.eks_alb_controller](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.eks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.eks_alb_controller](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.baserow_eks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.eks_alb_controller](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_kms_key.rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.valkey](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
+| [aws_route53_zone.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_zone) | resource |
 | [aws_security_group.db](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.valkey](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [random_password.valkey](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
@@ -49,8 +52,10 @@ The module can be configured using the following variables:
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_eks_cluster_auth.cluster](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
 | [aws_iam_policy_document.baserow_backend](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.eks_alb_controller_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.eks_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_secretsmanager_secret.rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret) | data source |
+| [aws_secretsmanager_secret_version.rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version) | data source |
 
 ## Inputs
 
@@ -61,9 +66,10 @@ The module can be configured using the following variables:
 | <a name="input_db_engine_version"></a> [db\_engine\_version](#input\_db\_engine\_version) | Aurora PostgreSQL engine version | `string` | `"17.5"` | no |
 | <a name="input_db_instance_class"></a> [db\_instance\_class](#input\_db\_instance\_class) | DB instance class | `string` | `"db.t4g.medium"` | no |
 | <a name="input_db_username"></a> [db\_username](#input\_db\_username) | Master DB username | `string` | `"baserow"` | no |
+| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name for Route53 record (e.g. example.com) | `string` | `""` | no |
 | <a name="input_eks_cluster_version"></a> [eks\_cluster\_version](#input\_eks\_cluster\_version) | EKS cluster version | `string` | `"1.33"` | no |
 | <a name="input_eks_node_desired_size"></a> [eks\_node\_desired\_size](#input\_eks\_node\_desired\_size) | Desired node count | `number` | `2` | no |
-| <a name="input_eks_node_instance_types"></a> [eks\_node\_instance\_types](#input\_eks\_node\_instance\_types) | Instance types for EKS managed node group | `list(string)` | <pre>[<br>  "t3.large"<br>]</pre> | no |
+| <a name="input_eks_node_instance_types"></a> [eks\_node\_instance\_types](#input\_eks\_node\_instance\_types) | Instance types for EKS managed node group | `list(string)` | <pre>[<br>  "t3.medium"<br>]</pre> | no |
 | <a name="input_eks_node_max_size"></a> [eks\_node\_max\_size](#input\_eks\_node\_max\_size) | Maximum node count | `number` | `4` | no |
 | <a name="input_eks_node_min_size"></a> [eks\_node\_min\_size](#input\_eks\_node\_min\_size) | Minimum node count | `number` | `2` | no |
 | <a name="input_elasticache_subnet_cidrs"></a> [elasticache\_subnet\_cidrs](#input\_elasticache\_subnet\_cidrs) | List of elasticache subnet CIDRs (one per AZ) | `list(string)` | <pre>[<br>  "10.10.30.0/24",<br>  "10.10.31.0/24"<br>]</pre> | no |
@@ -100,95 +106,103 @@ The module can be configured using the following variables:
 ```
 Project: main
 
- Name                                                                                 Monthly Qty  Unit                    Monthly Cost   
-                                                                                                                                          
- module.eks.module.eks_managed_node_group["stable"].aws_eks_node_group.this[0]                                                            
- └─ Instance usage (Linux/UNIX, on-demand, t3.large)                                        1,460  hours                        $140.16   
-                                                                                                                                          
- module.eks.aws_eks_cluster.this[0]                                                                                                       
- └─ EKS cluster                                                                               730  hours                         $73.00   
-                                                                                                                                          
- module.aurora.aws_rds_cluster_instance.this["t4g-one"]                                                                                   
- ├─ Database instance (on-demand, db.t4g.medium)                                              730  hours                         $62.05   
- └─ Performance Insights API                                                    Monthly cost depends on usage: $0.01 per 1000 requests    
-                                                                                                                                          
- module.aurora.aws_rds_cluster_instance.this["t4g-two"]                                                                                   
- ├─ Database instance (on-demand, db.t4g.medium)                                              730  hours                         $62.05   
- └─ Performance Insights API                                                    Monthly cost depends on usage: $0.01 per 1000 requests    
-                                                                                                                                          
- module.valkey.aws_elasticache_replication_group.this[0]                                                                                  
- └─ ElastiCache (on-demand, cache.t4g.small)                                                1,460  hours                         $42.05   
-                                                                                                                                          
- module.vpc.aws_nat_gateway.this[0]                                                                                                       
- ├─ NAT gateway                                                                               730  hours                         $37.96   
- └─ Data processed                                                              Monthly cost depends on usage: $0.052 per GB              
-                                                                                                                                          
- module.vpc.aws_nat_gateway.this[1]                                                                                                       
- ├─ NAT gateway                                                                               730  hours                         $37.96   
- └─ Data processed                                                              Monthly cost depends on usage: $0.052 per GB              
-                                                                                                                                          
- aws_kms_key.rds                                                                                                                          
- ├─ Customer master key                                                                         1  months                         $1.00   
- ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests     
- ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
- └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
-                                                                                                                                          
- aws_kms_key.s3                                                                                                                           
- ├─ Customer master key                                                                         1  months                         $1.00   
- ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests     
- ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
- └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
-                                                                                                                                          
- aws_kms_key.valkey                                                                                                                       
- ├─ Customer master key                                                                         1  months                         $1.00   
- ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests     
- ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
- └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
-                                                                                                                                          
- module.eks.module.kms.aws_kms_key.this[0]                                                                                                
- ├─ Customer master key                                                                         1  months                         $1.00   
- ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests     
- ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
- └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests     
-                                                                                                                                          
- module.aurora.aws_rds_cluster.this[0]                                                                                                    
- ├─ Storage                                                                     Monthly cost depends on usage: $0.12 per GB               
- ├─ I/O requests                                                                Monthly cost depends on usage: $0.22 per 1M requests      
- ├─ Backup storage                                                              Monthly cost depends on usage: $0.023 per GB              
- └─ Snapshot export                                                             Monthly cost depends on usage: $0.011 per GB              
-                                                                                                                                          
- module.eks.aws_cloudwatch_log_group.this[0]                                                                                              
- ├─ Data ingested                                                               Monthly cost depends on usage: $0.63 per GB               
- ├─ Archival Storage                                                            Monthly cost depends on usage: $0.0324 per GB             
- └─ Insights queries data scanned                                               Monthly cost depends on usage: $0.0063 per GB             
-                                                                                                                                          
- module.s3_bucket.aws_s3_bucket.this[0]                                                                                                   
- └─ Standard                                                                                                                              
-    ├─ Storage                                                                  Monthly cost depends on usage: $0.0245 per GB             
-    ├─ PUT, COPY, POST, LIST requests                                           Monthly cost depends on usage: $0.0054 per 1k requests    
-    ├─ GET, SELECT, and all other requests                                      Monthly cost depends on usage: $0.00043 per 1k requests   
-    ├─ Select data scanned                                                      Monthly cost depends on usage: $0.00225 per GB            
-    └─ Select data returned                                                     Monthly cost depends on usage: $0.0008 per GB             
-                                                                                                                                          
- module.valkey.aws_cloudwatch_log_group.this["slow-log"]                                                                                  
- ├─ Data ingested                                                               Monthly cost depends on usage: $0.63 per GB               
- ├─ Archival Storage                                                            Monthly cost depends on usage: $0.0324 per GB             
- └─ Insights queries data scanned                                               Monthly cost depends on usage: $0.0063 per GB             
-                                                                                                                                          
- OVERALL TOTAL                                                                                                                 $459.23 
+ Name                                                                                 Monthly Qty  Unit                    Monthly Cost
+
+ module.eks.aws_eks_cluster.this[0]
+ └─ EKS cluster                                                                               730  hours                         $73.00
+
+ module.eks.module.eks_managed_node_group["stable"].aws_eks_node_group.this[0]
+ └─ Instance usage (Linux/UNIX, on-demand, t3.medium)                                       1,460  hours                         $70.08
+
+ module.aurora.aws_rds_cluster_instance.this["t4g-one"]
+ ├─ Database instance (on-demand, db.t4g.medium)                                              730  hours                         $62.05
+ └─ Performance Insights API                                                    Monthly cost depends on usage: $0.01 per 1000 requests
+
+ module.aurora.aws_rds_cluster_instance.this["t4g-two"]
+ ├─ Database instance (on-demand, db.t4g.medium)                                              730  hours                         $62.05
+ └─ Performance Insights API                                                    Monthly cost depends on usage: $0.01 per 1000 requests
+
+ module.valkey.aws_elasticache_replication_group.this[0]
+ └─ ElastiCache (on-demand, cache.t4g.small)                                                1,460  hours                         $42.05
+
+ module.vpc.aws_nat_gateway.this[0]
+ ├─ NAT gateway                                                                               730  hours                         $37.96
+ └─ Data processed                                                              Monthly cost depends on usage: $0.052 per GB
+
+ module.vpc.aws_nat_gateway.this[1]
+ ├─ NAT gateway                                                                               730  hours                         $37.96
+ └─ Data processed                                                              Monthly cost depends on usage: $0.052 per GB
+
+ aws_kms_key.rds
+ ├─ Customer master key                                                                         1  months                         $1.00
+ ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests
+ ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+ └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+
+ aws_kms_key.s3
+ ├─ Customer master key                                                                         1  months                         $1.00
+ ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests
+ ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+ └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+
+ aws_kms_key.valkey
+ ├─ Customer master key                                                                         1  months                         $1.00
+ ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests
+ ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+ └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+
+ module.eks.module.kms.aws_kms_key.this[0]
+ ├─ Customer master key                                                                         1  months                         $1.00
+ ├─ Requests                                                                    Monthly cost depends on usage: $0.03 per 10k requests
+ ├─ ECC GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+ └─ RSA GenerateDataKeyPair requests                                            Monthly cost depends on usage: $0.10 per 10k requests
+
+ aws_route53_zone.public
+ └─ Hosted zone                                                                                 1  months                         $0.50
+
+ module.acm.aws_route53_record.validation[0]
+ ├─ Standard queries (first 1B)                                                 Monthly cost depends on usage: $0.40 per 1M queries
+ ├─ Latency based routing queries (first 1B)                                    Monthly cost depends on usage: $0.60 per 1M queries
+ └─ Geo DNS queries (first 1B)                                                  Monthly cost depends on usage: $0.70 per 1M queries
+
+ module.aurora.aws_rds_cluster.this[0]
+ ├─ Storage                                                                     Monthly cost depends on usage: $0.12 per GB
+ ├─ I/O requests                                                                Monthly cost depends on usage: $0.22 per 1M requests
+ ├─ Backup storage                                                              Monthly cost depends on usage: $0.023 per GB
+ └─ Snapshot export                                                             Monthly cost depends on usage: $0.011 per GB
+
+ module.eks.aws_cloudwatch_log_group.this[0]
+ ├─ Data ingested                                                               Monthly cost depends on usage: $0.63 per GB
+ ├─ Archival Storage                                                            Monthly cost depends on usage: $0.0324 per GB
+ └─ Insights queries data scanned                                               Monthly cost depends on usage: $0.0063 per GB
+
+ module.s3_bucket.aws_s3_bucket.this[0]
+ └─ Standard
+    ├─ Storage                                                                  Monthly cost depends on usage: $0.0245 per GB
+    ├─ PUT, COPY, POST, LIST requests                                           Monthly cost depends on usage: $0.0054 per 1k requests
+    ├─ GET, SELECT, and all other requests                                      Monthly cost depends on usage: $0.00043 per 1k requests
+    ├─ Select data scanned                                                      Monthly cost depends on usage: $0.00225 per GB
+    └─ Select data returned                                                     Monthly cost depends on usage: $0.0008 per GB
+
+ module.valkey.aws_cloudwatch_log_group.this["slow-log"]
+ ├─ Data ingested                                                               Monthly cost depends on usage: $0.63 per GB
+ ├─ Archival Storage                                                            Monthly cost depends on usage: $0.0324 per GB
+ └─ Insights queries data scanned                                               Monthly cost depends on usage: $0.0063 per GB
+
+ OVERALL TOTAL                                                                                                                 $389.65
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-100 cloud resources were detected:
-∙ 15 were estimated
-∙ 84 were free
+109 cloud resources were detected:
+∙ 17 were estimated
+∙ 91 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $459 ┃           - ┃       $459 ┃
+┃ main                                               ┃          $390 ┃           - ┃       $390 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 ```
 Update with

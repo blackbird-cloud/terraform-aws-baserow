@@ -31,11 +31,11 @@ module "aurora" {
   create_security_group = true
   security_group_rules = {
     ingress_from_app = {
-      type                     = "ingress"
-      from_port                = 5432
-      to_port                  = 5432
-      protocol                 = "tcp"
-      source_security_group_id = aws_security_group.db.id
+      type        = "ingress"
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = var.private_subnet_cidrs
     }
   }
 

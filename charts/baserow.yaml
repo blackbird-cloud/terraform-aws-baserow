@@ -1,15 +1,15 @@
 global:
   baserow:
-    domain: "your-baserow-domain.com"
-    backendDomain: "api.your-baserow-domain.com"
-    objectsDomain: "objects.your-baserow-domain.com"
+    domain: "${domain_name}"
+    backendDomain: "${backend_domain_name}"
+    objectsDomain: "${objects_domain_name}"
     serviceAccount:
-        shared: true
-        create: true
-        name: baserow
-        annotations: {
-          "eks.amazonaws.com/role-arn": "${eks_role_arn}"
-        }
+      shared: true
+      create: true
+      name: baserow
+      annotations: {
+        "eks.amazonaws.com/role-arn": "${eks_role_arn}"
+      }
 
 backendSecrets:
   DATABASE_HOST: "${database_host}"
@@ -27,15 +27,18 @@ backendConfigMap:
   AWS_S3_CUSTOM_DOMAIN: "${s3_bucket_name}"
   AWS_S3_REGION_NAME: "${s3_region_name}"
   AWS_S3_ENDPOINT_URL: "${s3_endpoint_url}"
+  BASEROW_EXTRA_ALLOWED_HOSTS: "*"
 
 ingress:
   enabled: true
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: "TCP"
-    service.beta.kubernetes.io/aws-load-balancer-alpn-policy: "HTTP2Preferred"
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/target-type: ip
 
 redis:
   enabled: false

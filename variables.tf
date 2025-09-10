@@ -71,7 +71,7 @@ variable "eks_cluster_version" {
 variable "eks_node_instance_types" {
   description = "Instance types for EKS managed node group"
   type        = list(string)
-  default     = ["t3.large"]
+  default     = ["t3.medium"]
 }
 
 variable "eks_node_desired_size" {
@@ -136,4 +136,10 @@ variable "tags" {
     Project   = "baserow"
     Terraform = "true"
   }
+}
+
+variable "domain_name" {
+  description = "Domain name for Route53 record (e.g. example.com)"
+  type        = string
+  default     = ""
 }

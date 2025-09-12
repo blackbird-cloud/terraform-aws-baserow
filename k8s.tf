@@ -1,47 +1,23 @@
-##############################################
-# Supporting helm charts
-##############################################
+# ##############################################
+# # Supporting helm charts
+# ##############################################
 
-module "helm_alb_controller" {
-  source  = "terraform-module/release/helm"
-  version = "2.9.1"
+module "k8s-charts" {
+  source     = "./k8s-charts"
+  depends_on = [module.eks]
 
-  namespace  = "kube-system"
-  repository = "https://aws.github.io/eks-charts"
+  tags   = var.tags
+  name   = var.name
+  region = var.region
+  vpc_id = module.vpc.vpc_id
 
-  app = {
-    create_namespace = true
-    name             = "aws-load-balancer-controller"
-    description      = "AWS Load Balancer Controller deployment"
-    version          = "1.13.4"
-    chart            = "aws-load-balancer-controller"
-    replace          = true
-    force_update     = true
-    wait             = true
-    recreate_pods    = false
-    deploy           = 1
-    timeout          = 600
-  }
+  cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  oidc_provider_arn       = module.eks.oidc_provider_arn
 
-  values = [yamlencode({
-    clusterName : var.name
-    vpcId : module.vpc.vpc_id
-    region : var.region
-    serviceAccount : {
-      create : true
-      name : "aws-load-balancer-controller"
-      annotations : {
-        "eks.amazonaws.com/role-arn" : aws_iam_role.eks_alb_controller.arn
-      }
-    }
-    controllerConfig : {
-      featureGates : {
-        EnableIPTargetType : true
-      }
-    }
-    enableServiceMutatorWebhook : false
-    })
-  ]
-
-  depends_on = [aws_iam_role.eks_alb_controller, module.aurora, module.valkey, module.s3_bucket, module.eks]
+  # baserow chart config
+  s3_bucket_arn   = module.s3_bucket.s3_bucket_arn
+  kms_s3_arn      = aws_kms_key.s3.arn
+  kms_rds_arn     = aws_kms_key.rds.arn
+  kms_valkey_arn  = aws_kms_key.valkey.arn
+  db_password_arn = module.aurora.cluster_master_user_secret[0].secret_arn
 }

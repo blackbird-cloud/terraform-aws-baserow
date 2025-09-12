@@ -28,17 +28,25 @@ backendConfigMap:
   AWS_S3_REGION_NAME: "${s3_region_name}"
   AWS_S3_ENDPOINT_URL: "${s3_endpoint_url}"
   BASEROW_EXTRA_ALLOWED_HOSTS: "*"
+  DONT_UPDATE_FORMULAS_AFTER_MIGRATION: "yes"
+  SYNC_TEMPLATES_ON_STARTUP: "false"
+  MIGRATE_ON_STARTUP: "false"
+  BASEROW_TRIGGER_SYNC_TEMPLATES_AFTER_MIGRATION: "true"
 
 ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: "alb"
-    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-path: "/_health/"
+    alb.ingress.kubernetes.io/healthcheck-port: "3000"
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/target-type: ip
+
+caddy:
+  enabled: false
 
 redis:
   enabled: false
@@ -49,5 +57,16 @@ postgresql:
 minio:
   enabled: false
 
-caddy:
+keda:
   enabled: false
+  scaling:
+    export:
+      enabled: true
+      queueName: "export"
+      queueLength: 10
+      activationLength: 1
+    worker:
+      enabled: true
+      queueName: "celery"
+      queueLength: 10
+      activationLength: 1

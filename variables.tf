@@ -14,6 +14,12 @@ variable "region" {
   default     = "eu-central-1"
 }
 
+variable "whitelist_ips" {
+  description = "List of CIDR blocks to whitelist for access (e.g. your office IP)"
+  type        = list(string)
+  default     = []
+}
+
 variable "vpc_cidr" {
   description = "VPC CIDR block"
   type        = string

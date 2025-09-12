@@ -6,15 +6,17 @@
 module "valkey" {
   source  = "terraform-aws-modules/elasticache/aws"
   version = "~> 1.7"
+
   # Valkey settings
   replication_group_id = "${var.name}-valkey"
-  engine               = "valkey" # Valkey compatible
-  engine_version       = "7.2"
+  engine               = "valkey"
+  engine_version       = "8.1"
   node_type            = var.valkey_node_type
-  num_cache_nodes      = var.valkey_num_cache_nodes
   num_cache_clusters   = 2
+
   # Network settings
-  az_mode                      = "cross-az"
+  automatic_failover_enabled   = true
+  multi_az_enabled             = true
   create_subnet_group          = false
   subnet_group_name            = module.vpc.elasticache_subnet_group
   vpc_id                       = module.vpc.vpc_id
@@ -29,8 +31,8 @@ module "valkey" {
 
   # Parameter Group
   create_parameter_group      = true
-  parameter_group_name        = var.name
-  parameter_group_family      = "valkey7"
+  parameter_group_name        = "${var.name}-8"
+  parameter_group_family      = "valkey8"
   parameter_group_description = "${title(var.name)} parameter group"
   parameters = [
     {
@@ -38,10 +40,6 @@ module "valkey" {
       value = "yes"
     }
   ]
-
-
-  automatic_failover_enabled = true
-  multi_az_enabled           = true
 
   tags = var.tags
 }

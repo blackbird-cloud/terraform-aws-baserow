@@ -77,7 +77,7 @@ variable "eks_cluster_version" {
 variable "eks_node_instance_types" {
   description = "Instance types for EKS managed node group"
   type        = list(string)
-  default     = ["t3.large"]
+  default     = ["t3.medium"]
 }
 
 variable "eks_node_desired_size" {

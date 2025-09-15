@@ -10,26 +10,21 @@ data "aws_secretsmanager_secret_version" "rds" {
   secret_id = data.aws_secretsmanager_secret.rds.id
 }
 
-module "helm" {
-  source  = "terraform-module/release/helm"
-  version = "2.9.1"
-
+resource "helm_release" "baserow" {
+  name       = "baserow"
   namespace  = "my-baserow"
-  repository = "https://baserow.gitlab.io/baserow-chart/"
-  app = {
-    create_namespace = true
-    name             = "baserow"
-    description      = "baserow deployment"
-    version          = "1.0.33"
-    chart            = "baserow"
-    replace          = true
-    force_update     = true
-    wait             = true
-    recreate_pods    = false
-    upgrade_install  = true
-    deploy           = 1
-  }
 
+  repository = "https://baserow.gitlab.io/baserow-chart/"
+  chart      = "baserow"
+  version    = "1.0.33"
+
+  create_namespace = true
+  description      = "AWS Load Balancer Controller deployment"
+  replace          = true
+  force_update     = true
+  wait             = true
+  recreate_pods    = false
+  timeout          = 600
   values = [
     templatefile("./chart-values/baserow.yaml", {
       database_host       = module.aurora.cluster_endpoint,
@@ -44,5 +39,4 @@ module "helm" {
       objects_domain_name = "objects.${var.domain_name}"
   })]
 
-  depends_on = [module.k8s-charts, module.valkey, module.s3_bucket, module.eks]
 }

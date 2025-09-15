@@ -38,11 +38,11 @@ module "helm" {
       s3_bucket_name      = module.s3_bucket.s3_bucket_id,
       s3_region_name      = var.region,
       s3_endpoint_url     = module.s3_bucket.s3_bucket_bucket_domain_name,
-      eks_role_arn        = module.k8s-charts.baserow_backend_role_arn,
+      eks_role_arn        = module.k8s_charts.baserow_backend_role_arn,
       domain_name         = var.domain_name
       backend_domain_name = "api.${var.domain_name}"
       objects_domain_name = "objects.${var.domain_name}"
   })]
 
-  depends_on = [module.k8s-charts, module.valkey, module.s3_bucket, module.eks]
+  depends_on = [module.k8s_charts, module.valkey, module.s3_bucket, module.eks]
 }

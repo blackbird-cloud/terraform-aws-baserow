@@ -108,7 +108,7 @@ resource "aws_iam_role_policy_attachment" "eks_alb_controller" {
 resource "aws_iam_policy" "eks_alb_controller" {
   name        = "${var.name}-eks-alb-controller-policy"
   description = "IAM policy for EKS ALB Controller to access AWS resources"
-  policy      = file("../policies/alb-controller-policy.json")
+  policy      = file("./policies/alb-controller-policy.json")
 }
 
 ##############################################
@@ -149,5 +149,5 @@ resource "aws_iam_role_policy_attachment" "eks_keda_controller" {
 resource "aws_iam_policy" "eks_keda_controller" {
   name        = "${var.name}-eks-keda-controller-policy"
   description = "IAM policy for EKS Keda Controller to access AWS resources"
-  policy      = file("../policies/keda.json")
+  policy      = file("policies/keda.json")
 }

@@ -129,12 +129,6 @@ variable "valkey_node_type" {
   default     = "cache.t4g.small"
 }
 
-variable "valkey_num_cache_nodes" {
-  description = "Number of Valkey cache nodes (for cluster mode disabled)"
-  type        = number
-  default     = 2
-}
-
 variable "tags" {
   description = "Common tags"
   type        = map(string)

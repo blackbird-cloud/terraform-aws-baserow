@@ -12,7 +12,7 @@ module "aurora" {
   engine_version = var.db_engine_version
   database_name  = replace(var.name, "-", "_")
 
-  master_username                     = var.db_username
+  master_username                     = "master"
   manage_master_user_password         = true
   iam_database_authentication_enabled = true
 
@@ -31,11 +31,10 @@ module "aurora" {
   create_security_group = true
   security_group_rules = {
     ingress_from_app = {
-      type        = "ingress"
-      from_port   = 5432
-      to_port     = 5432
-      protocol    = "tcp"
       cidr_blocks = var.private_subnet_cidrs
+    }
+    vpn = {
+      source_security_group_id = aws_security_group.client_vpn[0].id
     }
   }
 

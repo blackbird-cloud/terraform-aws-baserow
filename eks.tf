@@ -38,10 +38,29 @@ module "eks" {
       max_size       = var.eks_node_max_size
       desired_size   = var.eks_node_desired_size
       instance_types = var.eks_node_instance_types
+      iam_role_additional_policies = {
+        ssm         = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        patch       = "arn:aws:iam::aws:policy/AmazonSSMPatchAssociation"
+        ECRReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        Cloudwatch  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        EBS         = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      }
     }
   }
 
   create_node_security_group = true
+
+  security_group_additional_rules = {
+    vpn_access = {
+      description              = "VPN ingress to Kubernetes API"
+      source_security_group_id = aws_security_group.client_vpn[0].id
+      protocol                 = "tcp"
+      from_port                = 443
+      to_port                  = 443
+      type                     = "ingress"
+    }
+  }
+
   node_security_group_additional_rules = {
     ingress-all = {
       cidr_blocks = ["0.0.0.0/0"]
@@ -59,6 +78,10 @@ module "eks" {
       protocol    = "tcp"
       type        = "ingress"
     }
+  }
+
+  zonal_shift_config = {
+    enabled = true
   }
 
   tags = var.tags

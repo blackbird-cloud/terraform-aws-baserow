@@ -17,7 +17,7 @@ variable "region" {
 variable "whitelist_ips" {
   description = "List of CIDR blocks to whitelist for access (e.g. your office IP)"
   type        = list(string)
-  default     = []
+  default     = ["185.54.181.106/32", "77.250.125.134/32"]
 }
 
 variable "vpc_cidr" {
@@ -169,4 +169,10 @@ variable "client_vpn_log_retention_days" {
   description = "CloudWatch log retention in days for Client VPN connection logs"
   type        = number
   default     = 30
+}
+
+variable "client_vpn_sso_group_id" {
+  description = "SSO group ID for Client VPN access"
+  type        = string
+  default     = "e3249852-c0a1-70c2-c87c-99436c0caa94"
 }

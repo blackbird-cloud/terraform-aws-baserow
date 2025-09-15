@@ -63,9 +63,9 @@ module "client_vpn" {
   # Authentication (placeholder rules - adjust to least privilege)
   auth_rules = [
     {
-      cidr = module.vpc.vpc_cidr_block
+      cidr             = module.vpc.vpc_cidr_block
       description      = "Allow access to entire VPC"
-      groups           = ["Baserow"]
+      groups           = [var.client_vpn_sso_group_id]
     }
   ]
 

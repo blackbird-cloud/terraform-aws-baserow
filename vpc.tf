@@ -45,7 +45,6 @@ module "vpc" {
 ############################################################
 # Security Groups
 ############################################################
-
 resource "aws_security_group" "db" {
   name        = "${var.name}-db"
   description = "DB access"

@@ -10,6 +10,9 @@ data "aws_secretsmanager_secret_version" "rds" {
   secret_id = data.aws_secretsmanager_secret.rds.id
 }
 
+
+
+
 resource "helm_release" "baserow" {
   name       = "baserow"
   namespace  = "my-baserow"
@@ -28,7 +31,7 @@ resource "helm_release" "baserow" {
   values = [
     templatefile("./chart-values/baserow.yaml", {
       database_host       = module.aurora.cluster_endpoint,
-      database_password   = jsondecode(data.aws_secretsmanager_secret_version.rds.secret_string)["password"],
+      database_password   = random_password.baserow_postgres_role.result
       redis_host          = module.valkey.replication_group_primary_endpoint_address,
       s3_bucket_name      = module.s3_bucket.s3_bucket_id,
       s3_region_name      = var.region,

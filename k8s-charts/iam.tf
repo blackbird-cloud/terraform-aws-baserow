@@ -54,12 +54,12 @@ data "aws_iam_policy_document" "baserow_backend" {
     ]
   }
 
-  statement {
-    actions = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-    resources = [
-      var.db_password_arn
-    ]
-  }
+  # statement {
+  #   actions = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+  #   resources = [
+  #     var.db_password_arn
+  #   ]
+  # }
 
   statement {
     actions = ["s3:*"]

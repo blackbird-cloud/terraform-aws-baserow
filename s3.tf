@@ -33,6 +33,20 @@ resource "aws_kms_key" "s3" {
           "kms:DescribeKey"
         ],
         "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow the app to use the KMS key.",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : module.k8s-charts.baserow_backend_role_arn
+        },
+        "Action" : [
+          "kms:DescribeKey",
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey*"
+        ],
+        "Resource" : "*"
       }
     ]
   })
@@ -49,7 +63,11 @@ module "s3_bucket" {
   block_public_policy     = true
   block_public_acls       = true
   force_destroy           = false
+  acl    = "private"
 
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+  
   tags = var.tags
 
   server_side_encryption_configuration = {

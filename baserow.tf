@@ -11,8 +11,6 @@ data "aws_secretsmanager_secret_version" "rds" {
 }
 
 
-
-
 resource "helm_release" "baserow" {
   name       = "baserow"
   namespace  = "my-baserow"
@@ -36,7 +34,7 @@ resource "helm_release" "baserow" {
       redis_password      = random_password.valkey.result,
       s3_bucket_name      = module.s3_bucket.s3_bucket_id,
       s3_region_name      = var.region,
-      s3_endpoint_url     = module.s3_bucket.s3_bucket_bucket_domain_name,
+      s3_endpoint_url     = module.s3_bucket.s3_bucket_bucket_regional_domain_name,
       eks_role_arn        = module.k8s-charts.baserow_backend_role_arn,
       domain_name         = var.domain_name
       backend_domain_name = "api.${var.domain_name}"

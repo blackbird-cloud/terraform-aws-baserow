@@ -26,9 +26,9 @@ backendSecrets:
 
 backendConfigMap:
   AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
-  AWS_S3_CUSTOM_DOMAIN: "${s3_bucket_name}"
+  AWS_S3_CUSTOM_DOMAIN: "${s3_endpoint_url}"
   AWS_S3_REGION_NAME: "${s3_region_name}"
-  AWS_S3_ENDPOINT_URL: "${s3_endpoint_url}"
+  AWS_DEFAULT_ACL: "private"
   BASEROW_EXTRA_ALLOWED_HOSTS: "*"
   DONT_UPDATE_FORMULAS_AFTER_MIGRATION: "yes"
   SYNC_TEMPLATES_ON_STARTUP: "false"
@@ -43,8 +43,6 @@ backendConfigMap:
   EMAIL_SMTP_HOST: ${email_smtp_host}
   EMAIL_SMTP_PORT: "587"
   FROM_EMAIL: ${from_email}
-
-
 
 ingress:
   enabled: true

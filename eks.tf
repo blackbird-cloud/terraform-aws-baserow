@@ -23,8 +23,8 @@ module "eks" {
     }
   }
 
-  endpoint_public_access       = true
-  endpoint_public_access_cidrs = var.whitelist_ips
+  endpoint_public_access       = false
+  # endpoint_public_access_cidrs = var.whitelist_ips
   vpc_id                       = module.vpc.vpc_id
   control_plane_subnet_ids     = module.vpc.public_subnets
   subnet_ids                   = module.vpc.private_subnets

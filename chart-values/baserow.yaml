@@ -22,7 +22,7 @@ backendSecrets:
   REDIS_USER: "default"
   REDIS_PASSWORD: "${redis_password}"
   REDIS_PROTOCOL: "rediss"
-  
+
 backendConfigMap:
   AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
   AWS_S3_CUSTOM_DOMAIN: "${s3_bucket_name}"
@@ -33,6 +33,10 @@ backendConfigMap:
   SYNC_TEMPLATES_ON_STARTUP: "false"
   MIGRATE_ON_STARTUP: "false"
   BASEROW_TRIGGER_SYNC_TEMPLATES_AFTER_MIGRATION: "true"
+  BASEROW_SERVE_FILES_THROUGH_BACKEND: "true"
+  BASEROW_SERVE_FILES_THROUGH_BACKEND_PERMISSION: "SIGNED_IN"
+  BASEROW_SERVE_FILES_THROUGH_BACKEND_EXPIRE_SECONDS: "300"
+
 
 ingress:
   enabled: true

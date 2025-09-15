@@ -44,10 +44,10 @@ module "s3_bucket" {
 
   bucket = "${var.name}-data-${data.aws_caller_identity.current.account_id}"
 
-  restrict_public_buckets = false
-  ignore_public_acls      = false
-  block_public_policy     = false
-  block_public_acls       = false
+  restrict_public_buckets = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  block_public_acls       = true
   force_destroy           = false
 
   tags = var.tags

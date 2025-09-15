@@ -10,39 +10,37 @@ data "aws_secretsmanager_secret_version" "rds" {
   secret_id = data.aws_secretsmanager_secret.rds.id
 }
 
-module "helm" {
-  source  = "terraform-module/release/helm"
-  version = "2.9.1"
 
+
+
+resource "helm_release" "baserow" {
+  name       = "baserow"
   namespace  = "my-baserow"
-  repository = "https://baserow.gitlab.io/baserow-chart/"
-  app = {
-    create_namespace = true
-    name             = "baserow"
-    description      = "baserow deployment"
-    version          = "1.0.33"
-    chart            = "baserow"
-    replace          = true
-    force_update     = true
-    wait             = true
-    recreate_pods    = false
-    upgrade_install  = true
-    deploy           = 1
-  }
 
+  repository = "https://baserow.gitlab.io/baserow-chart/"
+  chart      = "baserow"
+  version    = "1.0.33"
+
+  create_namespace = true
+  description      = "AWS Load Balancer Controller deployment"
+  replace          = true
+  force_update     = true
+  wait             = true
+  recreate_pods    = false
+  timeout          = 300
   values = [
     templatefile("./chart-values/baserow.yaml", {
       database_host       = module.aurora.cluster_endpoint,
-      database_password   = jsondecode(data.aws_secretsmanager_secret_version.rds.secret_string)["password"],
+      database_password   = random_password.baserow_postgres_role.result
       redis_host          = module.valkey.replication_group_primary_endpoint_address,
+      redis_password      = random_password.valkey.result,
       s3_bucket_name      = module.s3_bucket.s3_bucket_id,
       s3_region_name      = var.region,
       s3_endpoint_url     = module.s3_bucket.s3_bucket_bucket_domain_name,
-      eks_role_arn        = module.k8s_charts.baserow_backend_role_arn,
+      eks_role_arn        = module.k8s-charts.baserow_backend_role_arn,
       domain_name         = var.domain_name
       backend_domain_name = "api.${var.domain_name}"
       objects_domain_name = "objects.${var.domain_name}"
   })]
-
-  depends_on = [module.k8s_charts, module.valkey, module.s3_bucket, module.eks]
+  depends_on = [ module.k8s-charts ]
 }

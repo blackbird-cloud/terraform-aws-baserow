@@ -17,7 +17,7 @@ variable "region" {
 variable "whitelist_ips" {
   description = "List of CIDR blocks to whitelist for access (e.g. your office IP)"
   type        = list(string)
-  default     = []
+  default     = ["185.54.181.106/32", "77.250.125.134/32"]
 }
 
 variable "vpc_cidr" {
@@ -77,7 +77,7 @@ variable "eks_cluster_version" {
 variable "eks_node_instance_types" {
   description = "Instance types for EKS managed node group"
   type        = list(string)
-  default     = ["t3.medium"]
+  default     = ["t3.xlarge"]
 }
 
 variable "eks_node_desired_size" {
@@ -141,5 +141,32 @@ variable "tags" {
 variable "domain_name" {
   description = "Domain name for Route53 record (e.g. example.com)"
   type        = string
-  default     = ""
+  default     = "baserow-webinar.blackbird.cloud"
+}
+
+# ------------------------------
+# Client VPN
+# ------------------------------
+variable "client_vpn_enabled" {
+  description = "Whether to create the AWS Client VPN endpoint"
+  type        = bool
+  default     = true
+}
+
+variable "client_vpn_cidr" {
+  description = "Client CIDR range for the Client VPN endpoint (must be /22 or /23 and non-overlapping)"
+  type        = string
+  default     = "10.250.0.0/22"
+}
+
+variable "client_vpn_log_retention_days" {
+  description = "CloudWatch log retention in days for Client VPN connection logs"
+  type        = number
+  default     = 30
+}
+
+variable "client_vpn_sso_group_id" {
+  description = "SSO group ID for Client VPN access"
+  type        = string
+  default     = "e3249852-c0a1-70c2-c87c-99436c0caa94"
 }

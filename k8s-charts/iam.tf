@@ -73,7 +73,6 @@ data "aws_iam_policy_document" "baserow_backend" {
 ##############################################
 # ALB Controller role
 ##############################################
-
 resource "aws_iam_role" "eks_alb_controller" {
   name               = "${var.name}-eks-alb-controller-role"
   assume_role_policy = data.aws_iam_policy_document.eks_alb_controller_assume_role.json
@@ -112,42 +111,90 @@ resource "aws_iam_policy" "eks_alb_controller" {
 }
 
 ##############################################
-# Keda Controller role
+# Cluster Autoscaler role
 ##############################################
-
-resource "aws_iam_role" "eks_keda_controller" {
-  name               = "${var.name}-eks-keda-controller-role"
-  assume_role_policy = data.aws_iam_policy_document.eks_keda_controller_assume_role.json
-  tags               = var.tags
+resource "aws_iam_policy" "cluster_autoscaler" {
+  name        = "${var.name}-cluster-autoscaler"
+  description = "Policy for Kubernetes Cluster Autoscaler"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeAutoScalingInstances",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:DescribeTags",
+          "autoscaling:SetDesiredCapacity",
+          "autoscaling:TerminateInstanceInAutoScalingGroup",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeInstances",
+          "ec2:DescribeImages",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeAccountAttributes",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:GetInstanceTypesFromInstanceRequirements",
+          "eks:DescribeNodegroup",
+          "eks:DescribeCluster"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
 
-data "aws_iam_policy_document" "eks_keda_controller_assume_role" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    principals {
-      type        = "Federated"
-      identifiers = [var.oidc_provider_arn]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:sub"
-      values   = ["system:serviceaccount:keda:keda-operator"]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:aud"
-      values   = ["sts.amazonaws.com"]
-    }
-  }
+resource "aws_iam_role" "cluster_autoscaler" {
+  name = "${var.name}-cluster-autoscaler"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = [var.oidc_provider_arn]
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${replace(var.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:cluster-autoscaler"
+          }
+        }
+      }
+    ]
+  })
+  tags = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "eks_keda_controller" {
-  role       = aws_iam_role.eks_keda_controller.name
-  policy_arn = aws_iam_policy.eks_keda_controller.arn
+resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
+  role       = aws_iam_role.cluster_autoscaler.name
+  policy_arn = aws_iam_policy.cluster_autoscaler.arn
 }
 
-resource "aws_iam_policy" "eks_keda_controller" {
-  name        = "${var.name}-eks-keda-controller-policy"
-  description = "IAM policy for EKS Keda Controller to access AWS resources"
-  policy      = file("policies/keda.json")
+resource "helm_release" "cluster_autoscaler" {
+  name       = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  version    = "9.50.1"
+  namespace  = "kube-system"
+
+  values = [templatefile("${path.module}/cluster_autoscaler_values.yaml", {
+    cluster_name        = var.cluster_name,
+    region              = var.region,
+    autoscaler_role_arn = aws_iam_role.cluster_autoscaler.arn
+  })]
+}
+
+output "cluster_autoscaler_iam_role_arn" {
+  value       = aws_iam_role.cluster_autoscaler.arn
+  description = "IAM role ARN for Kubernetes Cluster Autoscaler (use with IRSA in Helm deployment)"
+}
+
+output "cluster_autoscaler_helm_release_name" {
+  value       = helm_release.cluster_autoscaler.name
+  description = "Helm release name for the cluster autoscaler."
 }

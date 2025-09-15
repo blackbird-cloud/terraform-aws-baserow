@@ -41,6 +41,10 @@ resource "helm_release" "baserow" {
       domain_name         = var.domain_name
       backend_domain_name = "api.${var.domain_name}"
       objects_domain_name = "objects.${var.domain_name}"
+      from_email          = "info@${var.ses_identity}"
+      email_smtp_host     = "email-smtp.eu-central-1.amazonaws.com"
+      email_smtp_user     = aws_iam_access_key.baserow_smtp.id
+      email_smtp_password = aws_iam_access_key.baserow_smtp.ses_smtp_password_v4
   })]
   depends_on = [ module.k8s-charts ]
 }

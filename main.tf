@@ -4,6 +4,6 @@
 
 # Get available AZs in the region
 data "aws_availability_zones" "available" {}
-
-# Get current AWS account info
+data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}

@@ -22,6 +22,7 @@ backendSecrets:
   REDIS_USER: "default"
   REDIS_PASSWORD: "${redis_password}"
   REDIS_PROTOCOL: "rediss"
+  EMAIL_SMTP_PASSWORD: "${email_smtp_password}"
 
 backendConfigMap:
   AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
@@ -36,6 +37,13 @@ backendConfigMap:
   BASEROW_SERVE_FILES_THROUGH_BACKEND: "true"
   BASEROW_SERVE_FILES_THROUGH_BACKEND_PERMISSION: "SIGNED_IN"
   BASEROW_SERVE_FILES_THROUGH_BACKEND_EXPIRE_SECONDS: "300"
+  EMAIL_SMTP: "true"
+  EMAIL_SMTP_USE_TLS: "true"
+  EMAIL_SMTP_USER: "${email_smtp_user}"
+  EMAIL_SMTP_HOST: ${email_smtp_host}
+  EMAIL_SMTP_PORT: "587"
+  FROM_EMAIL: ${from_email}
+
 
 
 ingress:

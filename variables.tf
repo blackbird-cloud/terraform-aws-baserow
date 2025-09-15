@@ -156,7 +156,7 @@ variable "domain_name" {
 variable "client_vpn_enabled" {
   description = "Whether to create the AWS Client VPN endpoint"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "client_vpn_cidr" {

@@ -53,8 +53,12 @@ module "client_vpn" {
   client_cidr_block = var.client_vpn_cidr
   vpc_id            = module.vpc.vpc_id
   private_subnets   = local.client_vpn_subnets
-
+  security_group_ids = [aws_security_group.client_vpn[0].id]
   server_certificate_arn = module.acm.acm_certificate_arn
+  split_tunnel = true
+  dns_servers= [
+    "10.10.0.2"
+  ]
 
   # Authentication (placeholder rules - adjust to least privilege)
   auth_rules = [

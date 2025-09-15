@@ -9,7 +9,7 @@
     </md:KeyDescriptor>
     <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://portal.sso.eu-central-1.amazonaws.com/saml/logout/MDcwODUzMTkyMDE0X2lucy0yZmI0MzFiY2ExYmI1MDQz"/>
     <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://portal.sso.eu-central-1.amazonaws.com/saml/logout/MDcwODUzMTkyMDE0X2lucy0yZmI0MzFiY2ExYmI1MDQz"/>
-    <md:NameIDFormat/>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
     <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://portal.sso.eu-central-1.amazonaws.com/saml/assertion/MDcwODUzMTkyMDE0X2lucy0yZmI0MzFiY2ExYmI1MDQz"/>
     <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://portal.sso.eu-central-1.amazonaws.com/saml/assertion/MDcwODUzMTkyMDE0X2lucy0yZmI0MzFiY2ExYmI1MDQz"/>
   </md:IDPSSODescriptor>

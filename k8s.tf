@@ -2,7 +2,7 @@
 # # Supporting helm charts
 # ##############################################
 
-module "k8s_charts" {
+module "k8s-charts" {
   source     = "./k8s-charts"
   depends_on = [module.eks]
 

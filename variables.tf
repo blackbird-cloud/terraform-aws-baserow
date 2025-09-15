@@ -77,7 +77,7 @@ variable "eks_cluster_version" {
 variable "eks_node_instance_types" {
   description = "Instance types for EKS managed node group"
   type        = list(string)
-  default     = ["t3.medium"]
+  default     = ["t3.large"]
 }
 
 variable "eks_node_desired_size" {
@@ -147,5 +147,26 @@ variable "tags" {
 variable "domain_name" {
   description = "Domain name for Route53 record (e.g. example.com)"
   type        = string
-  default     = ""
+  default     = "baserow-webinar.blackbird.cloud"
+}
+
+# ------------------------------
+# Client VPN
+# ------------------------------
+variable "client_vpn_enabled" {
+  description = "Whether to create the AWS Client VPN endpoint"
+  type        = bool
+  default     = false
+}
+
+variable "client_vpn_cidr" {
+  description = "Client CIDR range for the Client VPN endpoint (must be /22 or /23 and non-overlapping)"
+  type        = string
+  default     = "10.250.0.0/22"
+}
+
+variable "client_vpn_log_retention_days" {
+  description = "CloudWatch log retention in days for Client VPN connection logs"
+  type        = number
+  default     = 30
 }

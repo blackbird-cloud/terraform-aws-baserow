@@ -108,46 +108,46 @@ resource "aws_iam_role_policy_attachment" "eks_alb_controller" {
 resource "aws_iam_policy" "eks_alb_controller" {
   name        = "${var.name}-eks-alb-controller-policy"
   description = "IAM policy for EKS ALB Controller to access AWS resources"
-  policy      = file("../policies/alb-controller-policy.json")
+  policy      = file("./policies/alb-controller-policy.json")
 }
 
-##############################################
-# Keda Controller role
-##############################################
+# ##############################################
+# # Keda Controller role
+# ##############################################
 
-resource "aws_iam_role" "eks_keda_controller" {
-  name               = "${var.name}-eks-keda-controller-role"
-  assume_role_policy = data.aws_iam_policy_document.eks_keda_controller_assume_role.json
-  tags               = var.tags
-}
+# resource "aws_iam_role" "eks_keda_controller" {
+#   name               = "${var.name}-eks-keda-controller-role"
+#   assume_role_policy = data.aws_iam_policy_document.eks_keda_controller_assume_role.json
+#   tags               = var.tags
+# }
 
-data "aws_iam_policy_document" "eks_keda_controller_assume_role" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    principals {
-      type        = "Federated"
-      identifiers = [var.oidc_provider_arn]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:sub"
-      values   = ["system:serviceaccount:keda:keda-operator"]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:aud"
-      values   = ["sts.amazonaws.com"]
-    }
-  }
-}
+# data "aws_iam_policy_document" "eks_keda_controller_assume_role" {
+#   statement {
+#     actions = ["sts:AssumeRoleWithWebIdentity"]
+#     principals {
+#       type        = "Federated"
+#       identifiers = [var.oidc_provider_arn]
+#     }
+#     condition {
+#       test     = "StringEquals"
+#       variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:sub"
+#       values   = ["system:serviceaccount:keda:keda-operator"]
+#     }
+#     condition {
+#       test     = "StringEquals"
+#       variable = "${replace(var.cluster_oidc_issuer_url, "https://", "")}:aud"
+#       values   = ["sts.amazonaws.com"]
+#     }
+#   }
+# }
 
-resource "aws_iam_role_policy_attachment" "eks_keda_controller" {
-  role       = aws_iam_role.eks_keda_controller.name
-  policy_arn = aws_iam_policy.eks_keda_controller.arn
-}
+# resource "aws_iam_role_policy_attachment" "eks_keda_controller" {
+#   role       = aws_iam_role.eks_keda_controller.name
+#   policy_arn = aws_iam_policy.eks_keda_controller.arn
+# }
 
-resource "aws_iam_policy" "eks_keda_controller" {
-  name        = "${var.name}-eks-keda-controller-policy"
-  description = "IAM policy for EKS Keda Controller to access AWS resources"
-  policy      = file("../policies/keda.json")
-}
+# # resource "aws_iam_policy" "eks_keda_controller" {
+# #   name        = "${var.name}-eks-keda-controller-policy"
+# #   description = "IAM policy for EKS Keda Controller to access AWS resources"
+# #   policy      = file("./policies/keda.json")
+# # }

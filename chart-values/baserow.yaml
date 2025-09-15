@@ -20,8 +20,9 @@ backendSecrets:
   REDIS_HOST: "${redis_host}"
   REDIS_PORT: "6379"
   REDIS_USER: "default"
-  REDIS_PASSWORD: "baserow"
-
+  REDIS_PASSWORD: "${redis_password}"
+  REDIS_PROTOCOL: "rediss"
+  
 backendConfigMap:
   AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
   AWS_S3_CUSTOM_DOMAIN: "${s3_bucket_name}"

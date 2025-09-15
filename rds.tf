@@ -10,7 +10,7 @@ module "aurora" {
   engine         = "aurora-postgresql"
   engine_mode    = "provisioned"
   engine_version = var.db_engine_version
-  database_name  = replace(var.name, "-", "_")
+  # database_name  = replace(var.name, "-", "_")
 
   master_username                     = "master"
   manage_master_user_password         = true

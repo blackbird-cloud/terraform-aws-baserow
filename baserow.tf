@@ -27,12 +27,13 @@ resource "helm_release" "baserow" {
   force_update     = true
   wait             = true
   recreate_pods    = false
-  timeout          = 600
+  timeout          = 300
   values = [
     templatefile("./chart-values/baserow.yaml", {
       database_host       = module.aurora.cluster_endpoint,
       database_password   = random_password.baserow_postgres_role.result
       redis_host          = module.valkey.replication_group_primary_endpoint_address,
+      redis_password      = random_password.valkey.result,
       s3_bucket_name      = module.s3_bucket.s3_bucket_id,
       s3_region_name      = var.region,
       s3_endpoint_url     = module.s3_bucket.s3_bucket_bucket_domain_name,
@@ -41,5 +42,5 @@ resource "helm_release" "baserow" {
       backend_domain_name = "api.${var.domain_name}"
       objects_domain_name = "objects.${var.domain_name}"
   })]
-
+  depends_on = [ module.k8s-charts ]
 }

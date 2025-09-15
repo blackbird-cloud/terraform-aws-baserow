@@ -109,3 +109,92 @@ resource "aws_iam_policy" "eks_alb_controller" {
   description = "IAM policy for EKS ALB Controller to access AWS resources"
   policy      = file("./policies/alb-controller-policy.json")
 }
+
+##############################################
+# Cluster Autoscaler role
+##############################################
+resource "aws_iam_policy" "cluster_autoscaler" {
+  name        = "${var.name}-cluster-autoscaler"
+  description = "Policy for Kubernetes Cluster Autoscaler"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeAutoScalingInstances",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:DescribeTags",
+          "autoscaling:SetDesiredCapacity",
+          "autoscaling:TerminateInstanceInAutoScalingGroup",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeInstances",
+          "ec2:DescribeImages",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeAccountAttributes",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:GetInstanceTypesFromInstanceRequirements",
+          "eks:DescribeNodegroup",
+          "eks:DescribeCluster"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "cluster_autoscaler" {
+  name = "${var.name}-cluster-autoscaler"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = [var.oidc_provider_arn]
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${replace(var.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:cluster-autoscaler"
+          }
+        }
+      }
+    ]
+  })
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
+  role       = aws_iam_role.cluster_autoscaler.name
+  policy_arn = aws_iam_policy.cluster_autoscaler.arn
+}
+
+resource "helm_release" "cluster_autoscaler" {
+  name       = "cluster-autoscaler"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  version    = "9.50.1"
+  namespace  = "kube-system"
+
+  values = [templatefile("${path.module}/cluster_autoscaler_values.yaml", {
+    cluster_name        = var.cluster_name,
+    region              = var.region,
+    autoscaler_role_arn = aws_iam_role.cluster_autoscaler.arn
+  })]
+}
+
+output "cluster_autoscaler_iam_role_arn" {
+  value       = aws_iam_role.cluster_autoscaler.arn
+  description = "IAM role ARN for Kubernetes Cluster Autoscaler (use with IRSA in Helm deployment)"
+}
+
+output "cluster_autoscaler_helm_release_name" {
+  value       = helm_release.cluster_autoscaler.name
+  description = "Helm release name for the cluster autoscaler."
+}

@@ -1,5 +1,6 @@
 resource "postgresql_database" "baserow" {
   name = "baserow"
+  owner = postgresql_role.baserow.name
   lifecycle {
     prevent_destroy = true
   }

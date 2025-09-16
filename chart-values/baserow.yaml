@@ -1,7 +1,7 @@
 global:
   baserow:
     image:
-      tag: 1.35.1
+      tag: 1.35.0
     domain: "${domain_name}"
     backendDomain: "${backend_domain_name}"
     objectsDomain: "${objects_domain_name}"
@@ -9,9 +9,8 @@ global:
       shared: true
       create: true
       name: baserow
-      annotations: {
+      annotations:
         "eks.amazonaws.com/role-arn": "${eks_role_arn}"
-      }
 
 backendSecrets:
   DATABASE_HOST: "${database_host}"
@@ -27,26 +26,41 @@ backendSecrets:
   EMAIL_SMTP_PASSWORD: "${email_smtp_password}"
 
 backendConfigMap:
-  AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
-  AWS_S3_CUSTOM_DOMAIN: "${s3_endpoint_url}"
-  AWS_S3_REGION_NAME: "${s3_region_name}"
-  AWS_DEFAULT_ACL: "private"
   BASEROW_EXTRA_ALLOWED_HOSTS: "*"
   DONT_UPDATE_FORMULAS_AFTER_MIGRATION: "yes"
   SYNC_TEMPLATES_ON_STARTUP: "false"
   MIGRATE_ON_STARTUP: "false"
   BASEROW_TRIGGER_SYNC_TEMPLATES_AFTER_MIGRATION: "true"
+  # File management
+  AWS_STORAGE_BUCKET_NAME: "${s3_bucket_name}"
+  AWS_S3_CUSTOM_DOMAIN: "${s3_endpoint_url}"
+  AWS_S3_REGION_NAME: "${s3_region_name}"
+  AWS_DEFAULT_ACL: "private"
   BASEROW_SERVE_FILES_THROUGH_BACKEND: "true"
   BASEROW_SERVE_FILES_THROUGH_BACKEND_PERMISSION: "SIGNED_IN"
   BASEROW_SERVE_FILES_THROUGH_BACKEND_EXPIRE_SECONDS: "300"
+  # Email
   EMAIL_SMTP: "true"
   EMAIL_SMTP_USE_TLS: "true"
   EMAIL_SMTP_USER: "${email_smtp_user}"
   EMAIL_SMTP_HOST: ${email_smtp_host}
   EMAIL_SMTP_PORT: "587"
   FROM_EMAIL: ${from_email}
+  # Monitoring
+  BASEROW_ENABLE_OTEL: "true"
+  OTEL_METRIC_EXPORT_INTERVAL: "7200000"
+  OTEL_PER_MODULE_SAMPLER_OVERRIDES: "opentelemetry.instrumentation.celery=opentelemetry.instrumentation.django=always_on"
+  OTEL_TRACES_SAMPLER: "traceidratio"
+  OTEL_TRACES_SAMPLER_ARG:  "0.05"
+  BASEROW_AMOUNT_OF_GUNICORN_WORKERS: 3
+  BASEROW_AMOUNT_OF_WORKERS: 3
+  SENTRY_DSN: https://900451afbf14c6b0da0d78f3565c7a64@o4510030028537856.ingest.de.sentry.io/4510030030635088
+  # Analytics
+  POSTHOG_PROJECT_API_KEY: ""
+  POSTHOG_HOST: ""
 
 baserow-backend-wsgi:
+  tolerations: ${tolerations}
   autoscaling:
     enabled: true
     minReplicas: 2
@@ -80,6 +94,7 @@ baserow-backend-asgi:
     targetMemoryUtilizationPercentage: 80
 
 baserow-frontend:
+  tolerations: ${tolerations}
   autoscaling:
     enabled: true
     minReplicas: 2

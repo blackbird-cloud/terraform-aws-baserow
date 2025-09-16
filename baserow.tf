@@ -11,7 +11,7 @@ resource "helm_release" "baserow" {
   version    = "1.0.33"
 
   create_namespace = true
-  description      = "AWS Load Balancer Controller deployment"
+  description      = "The Baserow deployment"
   replace          = true
   force_update     = true
   wait             = true
@@ -35,6 +35,7 @@ resource "helm_release" "baserow" {
       email_smtp_user     = aws_iam_access_key.baserow_smtp.id
       email_smtp_password = aws_iam_access_key.baserow_smtp.ses_smtp_password_v4
       waf_acl_arn         = module.waf.arn
+      tolerations         = jsonencode(local.spot_tolerations)
   })]
   depends_on = [module.k8s_charts]
 }

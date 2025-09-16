@@ -52,13 +52,7 @@ resource "postgresql_grant" "baserow_table" {
   schema      = "public"
   object_type = "table"
   privileges = [
-    "DELETE",
-    "INSERT",
-    "REFERENCES",
-    "SELECT",
-    "TRIGGER",
-    "TRUNCATE",
-    "UPDATE",
+    "ALL"
   ]
   lifecycle {
     prevent_destroy = true
@@ -95,9 +89,3 @@ resource "random_password" "baserow_postgres_role" {
   length  = 24
   special = true
 }
-
-# output "baserow_postgres_role_password" {
-#   value     = random_password.baserow_postgres_role.result
-#   sensitive = true
-#   description = "Password for the Baserow Postgres role."
-# }

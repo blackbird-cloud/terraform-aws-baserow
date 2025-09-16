@@ -1,6 +1,9 @@
 ############################################################
 # EKS Cluster
 ############################################################
+locals {
+  spot_tolerations = [for taint in module.eks.eks_managed_node_groups.spot.node_group_taints : { key : taint.key, value : taint.value, effect : "NoSchedule" }]
+}
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -62,6 +65,13 @@ module "eks" {
         EBS         = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
       }
       capacity_type = "SPOT"
+      taints = {
+        spot = {
+          key    = "spot"
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
+      }
       labels = {
         Instance = "spot"
       }

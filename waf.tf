@@ -24,9 +24,9 @@ module "waf" {
 
   managed_rule_group_statement_rules = [
     {
-      name            = "AWS-AWSManagedRulesAdminProtectionRuleSet"
-      priority        = 1
-      override_action = "count"
+      name                     = "AWS-AWSManagedRulesAdminProtectionRuleSet"
+      priority                 = 1
+      override_override_action = "count"
 
       statement = {
         name        = "AWSManagedRulesAdminProtectionRuleSet"
@@ -36,12 +36,13 @@ module "waf" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
-        metric_name                = "baserow-AWSManagedRulesAdminProtectionRuleSet"
+        metric_name                = "AWS-AWSManagedRulesAdminProtectionRuleSet"
       }
     },
     {
-      name     = "AWS-AWSManagedRulesAmazonIpReputationList"
-      priority = 2
+      name            = "AWS-AWSManagedRulesAmazonIpReputationList"
+      priority        = 2
+      override_action = "count"
 
       statement = {
         name        = "AWSManagedRulesAmazonIpReputationList"
@@ -51,12 +52,13 @@ module "waf" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
-        metric_name                = "baserow-AWSManagedRulesAmazonIpReputationList"
+        metric_name                = "AWS-AWSManagedRulesAmazonIpReputationList"
       }
     },
     {
-      name     = "AWS-AWSManagedRulesCommonRuleSet"
-      priority = 3
+      name            = "AWS-AWSManagedRulesCommonRuleSet"
+      priority        = 3
+      override_action = "count"
 
       statement = {
         name        = "AWSManagedRulesCommonRuleSet"
@@ -66,12 +68,13 @@ module "waf" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
-        metric_name                = "baserow-AWSManagedRulesCommonRuleSet"
+        metric_name                = "AWS-AWSManagedRulesCommonRuleSet"
       }
     },
     {
-      name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
-      priority = 4
+      name            = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+      priority        = 4
+      override_action = "count"
 
       statement = {
         name        = "AWSManagedRulesKnownBadInputsRuleSet"
@@ -81,12 +84,13 @@ module "waf" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
-        metric_name                = "baserow-AWSManagedRulesKnownBadInputsRuleSet"
+        metric_name                = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
       }
     },
     {
-      name     = "AWS-AWSManagedRulesBotControlRuleSet"
-      priority = 5
+      name            = "AWS-AWSManagedRulesBotControlRuleSet"
+      priority        = 5
+      override_action = "count"
 
       statement = {
         name        = "AWSManagedRulesBotControlRuleSet"
@@ -104,12 +108,13 @@ module "waf" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
-        metric_name                = "baserow-AWSManagedRulesBotControlRuleSet"
+        metric_name                = "AWS-AWSManagedRulesBotControlRuleSet"
       }
     },
     {
-      name     = "AWS-AWSManagedRulesSQLiRuleSet"
-      priority = 7
+      name            = "AWS-AWSManagedRulesSQLiRuleSet"
+      priority        = 7
+      override_action = "count"
       statement = {
         name        = "AWSManagedRulesSQLiRuleSet"
         vendor_name = "AWS"
@@ -117,7 +122,7 @@ module "waf" {
       visibility_config = {
         cloudwatch_metrics_enabled = true
         sampled_requests_enabled   = true
-        metric_name                = "baserow-AWSManagedRulesSQLiRuleSet"
+        metric_name                = "AWS-AWSManagedRulesSQLiRuleSet"
       }
     }
   ]

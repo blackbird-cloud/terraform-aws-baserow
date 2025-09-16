@@ -3,7 +3,7 @@ Project: main
  Name                                                                                                                                                      Monthly Qty  Unit                    Monthly Cost
 
  module.eks.module.eks_managed_node_group["stable"].aws_eks_node_group.this[0]
- └─ Instance usage (Linux/UNIX, on-demand, t3.xlarge)                                                                                                            1,460  hours                        $280.32
+ └─ Instance usage (Linux/UNIX, on-demand, t3.xlarge)                                                                                                              730  hours                        $140.16
 
  module.client_vpn[0].aws_ec2_client_vpn_network_association.associations["hcl-01702e9beb30874c07511f805f215c4f2edda95df92a0d2cb9e49814f0b42635-0"]
  └─ Endpoint association                                                                                                                                           730  hours                         $73.00
@@ -22,6 +22,9 @@ Project: main
  ├─ Database instance (on-demand, db.t4g.medium)                                                                                                                   730  hours                         $62.05
  └─ Performance Insights API                                                                                                                         Monthly cost depends on usage: $0.01 per 1000 requests
 
+ module.eks.module.eks_managed_node_group["spot"].aws_eks_node_group.this[0]
+ └─ Instance usage (Linux/UNIX, spot, t3.xlarge)                                                                                                                   730  hours                         $55.92
+
  module.valkey.aws_elasticache_replication_group.this[0]
  └─ ElastiCache (on-demand, cache.t4g.small)                                                                                                                     1,460  hours                         $42.05
 
@@ -35,6 +38,10 @@ Project: main
 
  module.client_vpn[0].aws_ec2_client_vpn_endpoint.vpn
  └─ Connection                                                                                                                                                     730  hours                         $36.50
+
+ module.waf.aws_wafv2_web_acl.default[0]
+ ├─ Web ACL usage                                                                                                                                                    1  months                         $5.00
+ └─ Requests                                                                                                                                         Monthly cost depends on usage: $0.60 per 1M requests
 
  aws_kms_key.rds
  ├─ Customer master key                                                                                                                                              1  months                         $1.00
@@ -64,6 +71,11 @@ Project: main
  └─ Hosted zone                                                                                                                                                      1  months                         $0.50
 
  aws_cloudwatch_log_group.client_vpn[0]
+ ├─ Data ingested                                                                                                                                    Monthly cost depends on usage: $0.63 per GB
+ ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
+ └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
+
+ aws_cloudwatch_log_group.waf
  ├─ Data ingested                                                                                                                                    Monthly cost depends on usage: $0.63 per GB
  ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
  └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
@@ -117,18 +129,18 @@ Project: main
  ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
  └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
 
- OVERALL TOTAL                                                                                                                                                                                      $782.39
+ OVERALL TOTAL                                                                                                                                                                                      $703.15
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-137 cloud resources were detected:
-∙ 25 were estimated
-∙ 111 were free
+150 cloud resources were detected:
+∙ 28 were estimated
+∙ 121 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $782 ┃           - ┃       $782 ┃
+┃ main                                               ┃          $703 ┃           - ┃       $703 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

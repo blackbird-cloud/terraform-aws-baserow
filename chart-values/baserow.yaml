@@ -1,5 +1,7 @@
 global:
   baserow:
+    image:
+      tag: 1.35.1
     domain: "${domain_name}"
     backendDomain: "${backend_domain_name}"
     objectsDomain: "${objects_domain_name}"
@@ -43,6 +45,70 @@ backendConfigMap:
   EMAIL_SMTP_HOST: ${email_smtp_host}
   EMAIL_SMTP_PORT: "587"
   FROM_EMAIL: ${from_email}
+
+baserow-backend-wsgi:
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 50
+          preference:
+            matchExpressions:
+              - key: Instance
+                operator: In
+                values:
+                  - spot
+        - weight: 50
+          preference:
+            matchExpressions:
+              - key: Instance
+                operator: In
+                values:
+                  - stable
+
+baserow-backend-asgi:
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+baserow-frontend:
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 50
+          preference:
+            matchExpressions:
+              - key: Instance
+                operator: In
+                values:
+                  - spot
+        - weight: 50
+          preference:
+            matchExpressions:
+              - key: Instance
+                operator: In
+                values:
+                  - stable
+
+baserow-celery-flower:
+  enabled: true
+  args:
+    - celery-flower
+  replicaCount: 1
 
 ingress:
   enabled: true

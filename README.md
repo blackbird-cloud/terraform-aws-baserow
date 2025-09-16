@@ -39,6 +39,7 @@ The module can be configured using the following variables:
 | Name | Type |
 |------|------|
 | [aws_cloudwatch_log_group.client_vpn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_log_group.waf](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 | [aws_iam_access_key.baserow_smtp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_user.baserow_smtp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy.baserow_smtp_send](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
@@ -85,10 +86,14 @@ The module can be configured using the following variables:
 | <a name="input_db_instance_class"></a> [db\_instance\_class](#input\_db\_instance\_class) | DB instance class | `string` | `"db.t4g.medium"` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Domain name for Route53 record (e.g. example.com) | `string` | `"baserow-webinar.blackbird.cloud"` | no |
 | <a name="input_eks_cluster_version"></a> [eks\_cluster\_version](#input\_eks\_cluster\_version) | EKS cluster version | `string` | `"1.33"` | no |
-| <a name="input_eks_node_desired_size"></a> [eks\_node\_desired\_size](#input\_eks\_node\_desired\_size) | Desired node count | `number` | `2` | no |
-| <a name="input_eks_node_instance_types"></a> [eks\_node\_instance\_types](#input\_eks\_node\_instance\_types) | Instance types for EKS managed node group | `list(string)` | <pre>[<br>  "t3.xlarge"<br>]</pre> | no |
-| <a name="input_eks_node_max_size"></a> [eks\_node\_max\_size](#input\_eks\_node\_max\_size) | Maximum node count | `number` | `4` | no |
-| <a name="input_eks_node_min_size"></a> [eks\_node\_min\_size](#input\_eks\_node\_min\_size) | Minimum node count | `number` | `2` | no |
+| <a name="input_eks_spot_node_desired_size"></a> [eks\_spot\_node\_desired\_size](#input\_eks\_spot\_node\_desired\_size) | Desired spot node count | `number` | `1` | no |
+| <a name="input_eks_spot_node_instance_types"></a> [eks\_spot\_node\_instance\_types](#input\_eks\_spot\_node\_instance\_types) | Instance types for spot node group | `list(string)` | <pre>[<br>  "t3.xlarge"<br>]</pre> | no |
+| <a name="input_eks_spot_node_max_size"></a> [eks\_spot\_node\_max\_size](#input\_eks\_spot\_node\_max\_size) | Maximum spot node count | `number` | `2` | no |
+| <a name="input_eks_spot_node_min_size"></a> [eks\_spot\_node\_min\_size](#input\_eks\_spot\_node\_min\_size) | Minimum spot node count | `number` | `1` | no |
+| <a name="input_eks_stable_node_desired_size"></a> [eks\_stable\_node\_desired\_size](#input\_eks\_stable\_node\_desired\_size) | Desired stable node count | `number` | `1` | no |
+| <a name="input_eks_stable_node_instance_types"></a> [eks\_stable\_node\_instance\_types](#input\_eks\_stable\_node\_instance\_types) | Instance types for stable node group | `list(string)` | <pre>[<br>  "t3.xlarge"<br>]</pre> | no |
+| <a name="input_eks_stable_node_max_size"></a> [eks\_stable\_node\_max\_size](#input\_eks\_stable\_node\_max\_size) | Maximum stable node count | `number` | `2` | no |
+| <a name="input_eks_stable_node_min_size"></a> [eks\_stable\_node\_min\_size](#input\_eks\_stable\_node\_min\_size) | Minimum stable node count | `number` | `1` | no |
 | <a name="input_elasticache_subnet_cidrs"></a> [elasticache\_subnet\_cidrs](#input\_elasticache\_subnet\_cidrs) | List of elasticache subnet CIDRs (one per AZ) | `list(string)` | <pre>[<br>  "10.10.30.0/24",<br>  "10.10.31.0/24"<br>]</pre> | no |
 | <a name="input_name"></a> [name](#input\_name) | Base name/prefix for all resources | `string` | `"baserow"` | no |
 | <a name="input_private_subnet_cidrs"></a> [private\_subnet\_cidrs](#input\_private\_subnet\_cidrs) | List of private subnet CIDRs (one per AZ) | `list(string)` | <pre>[<br>  "10.10.10.0/24",<br>  "10.10.11.0/24"<br>]</pre> | no |
@@ -126,7 +131,7 @@ Project: main
  Name                                                                                                                                                      Monthly Qty  Unit                    Monthly Cost
 
  module.eks.module.eks_managed_node_group["stable"].aws_eks_node_group.this[0]
- └─ Instance usage (Linux/UNIX, on-demand, t3.xlarge)                                                                                                            1,460  hours                        $280.32
+ └─ Instance usage (Linux/UNIX, on-demand, t3.xlarge)                                                                                                              730  hours                        $140.16
 
  module.client_vpn[0].aws_ec2_client_vpn_network_association.associations["hcl-01702e9beb30874c07511f805f215c4f2edda95df92a0d2cb9e49814f0b42635-0"]
  └─ Endpoint association                                                                                                                                           730  hours                         $73.00
@@ -145,6 +150,9 @@ Project: main
  ├─ Database instance (on-demand, db.t4g.medium)                                                                                                                   730  hours                         $62.05
  └─ Performance Insights API                                                                                                                         Monthly cost depends on usage: $0.01 per 1000 requests
 
+ module.eks.module.eks_managed_node_group["spot"].aws_eks_node_group.this[0]
+ └─ Instance usage (Linux/UNIX, spot, t3.xlarge)                                                                                                                   730  hours                         $55.92
+
  module.valkey.aws_elasticache_replication_group.this[0]
  └─ ElastiCache (on-demand, cache.t4g.small)                                                                                                                     1,460  hours                         $42.05
 
@@ -158,6 +166,10 @@ Project: main
 
  module.client_vpn[0].aws_ec2_client_vpn_endpoint.vpn
  └─ Connection                                                                                                                                                     730  hours                         $36.50
+
+ module.waf.aws_wafv2_web_acl.default[0]
+ ├─ Web ACL usage                                                                                                                                                    1  months                         $5.00
+ └─ Requests                                                                                                                                         Monthly cost depends on usage: $0.60 per 1M requests
 
  aws_kms_key.rds
  ├─ Customer master key                                                                                                                                              1  months                         $1.00
@@ -187,6 +199,11 @@ Project: main
  └─ Hosted zone                                                                                                                                                      1  months                         $0.50
 
  aws_cloudwatch_log_group.client_vpn[0]
+ ├─ Data ingested                                                                                                                                    Monthly cost depends on usage: $0.63 per GB
+ ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
+ └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
+
+ aws_cloudwatch_log_group.waf
  ├─ Data ingested                                                                                                                                    Monthly cost depends on usage: $0.63 per GB
  ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
  └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
@@ -240,20 +257,20 @@ Project: main
  ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
  └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
 
- OVERALL TOTAL                                                                                                                                                                                      $782.39
+ OVERALL TOTAL                                                                                                                                                                                      $703.15
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-137 cloud resources were detected:
-∙ 25 were estimated
-∙ 111 were free
+150 cloud resources were detected:
+∙ 28 were estimated
+∙ 121 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $782 ┃           - ┃       $782 ┃
+┃ main                                               ┃          $703 ┃           - ┃       $703 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 ```
 Update with

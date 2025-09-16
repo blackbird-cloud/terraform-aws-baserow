@@ -34,16 +34,36 @@ module "eks" {
 
   eks_managed_node_groups = {
     stable = {
-      min_size       = var.eks_node_min_size
-      max_size       = var.eks_node_max_size
-      desired_size   = var.eks_node_desired_size
-      instance_types = var.eks_node_instance_types
+      min_size       = var.eks_stable_node_min_size
+      max_size       = var.eks_stable_node_max_size
+      desired_size   = var.eks_stable_node_desired_size
+      instance_types = var.eks_stable_node_instance_types
+      labels = {
+        Instance = "stable"
+      }
       iam_role_additional_policies = {
         ssm         = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
         patch       = "arn:aws:iam::aws:policy/AmazonSSMPatchAssociation"
         ECRReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
         Cloudwatch  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         EBS         = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      }
+    }
+    spot = {
+      min_size       = var.eks_spot_node_min_size
+      max_size       = var.eks_spot_node_max_size
+      desired_size   = var.eks_spot_node_desired_size
+      instance_types = var.eks_spot_node_instance_types
+      iam_role_additional_policies = {
+        ssm         = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        patch       = "arn:aws:iam::aws:policy/AmazonSSMPatchAssociation"
+        ECRReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        Cloudwatch  = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+        EBS         = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      }
+      capacity_type = "SPOT"
+      labels = {
+        Instance = "spot"
       }
     }
   }

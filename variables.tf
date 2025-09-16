@@ -74,28 +74,51 @@ variable "eks_cluster_version" {
   default     = "1.33"
 }
 
-variable "eks_node_instance_types" {
-  description = "Instance types for EKS managed node group"
+variable "eks_stable_node_instance_types" {
+  description = "Instance types for stable node group"
   type        = list(string)
   default     = ["t3.xlarge"]
 }
 
-variable "eks_node_desired_size" {
-  description = "Desired node count"
+variable "eks_stable_node_desired_size" {
+  description = "Desired stable node count"
+  type        = number
+  default     = 1
+}
+
+variable "eks_stable_node_min_size" {
+  description = "Minimum stable node count"
+  type        = number
+  default     = 1
+}
+
+variable "eks_stable_node_max_size" {
+  description = "Maximum stable node count"
   type        = number
   default     = 2
 }
-
-variable "eks_node_min_size" {
-  description = "Minimum node count"
-  type        = number
-  default     = 2
+variable "eks_spot_node_instance_types" {
+  description = "Instance types for spot node group"
+  type        = list(string)
+  default     = ["t3.xlarge"]
 }
 
-variable "eks_node_max_size" {
-  description = "Maximum node count"
+variable "eks_spot_node_desired_size" {
+  description = "Desired spot node count"
   type        = number
-  default     = 4
+  default     = 1
+}
+
+variable "eks_spot_node_min_size" {
+  description = "Minimum spot node count"
+  type        = number
+  default     = 1
+}
+
+variable "eks_spot_node_max_size" {
+  description = "Maximum spot node count"
+  type        = number
+  default     = 2
 }
 
 variable "db_engine_version" {

@@ -2,13 +2,6 @@
 # AWS SES setup for Baserow
 ############################################################
 
-# Replace with your verified domain or email
-variable "ses_identity" {
-  description = "SES identity (domain or email) to verify and use for sending."
-  type        = string
-  default     = "baserow-webinar.blackbird.cloud"
-}
-
 resource "aws_sesv2_email_identity" "main" {
   email_identity         = var.ses_identity
   configuration_set_name = aws_sesv2_configuration_set.main.configuration_set_name
@@ -106,8 +99,8 @@ resource "aws_iam_user_policy" "baserow_smtp_send" {
       {
         Effect = "Allow",
         Action = [
-            "ses:SendEmail",
-            "ses:SendRawEmail"
+          "ses:SendEmail",
+          "ses:SendRawEmail"
         ],
         Resource = "*"
       }

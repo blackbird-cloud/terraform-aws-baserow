@@ -42,30 +42,28 @@ resource "aws_cloudwatch_log_group" "client_vpn" {
   tags              = merge(var.tags, { Component = "client-vpn" })
 }
 
-data "aws_ssoadmin_instances" "current" {}
-
 module "client_vpn" {
   source  = "blackbird-cloud/client-vpn/aws"
   version = "~> 2.0"
   count   = var.client_vpn_enabled ? 1 : 0
 
-  name              = var.name
-  client_cidr_block = var.client_vpn_cidr
-  vpc_id            = module.vpc.vpc_id
-  private_subnets   = local.client_vpn_subnets
-  security_group_ids = [aws_security_group.client_vpn[0].id]
+  name                   = var.name
+  client_cidr_block      = var.client_vpn_cidr
+  vpc_id                 = module.vpc.vpc_id
+  private_subnets        = local.client_vpn_subnets
+  security_group_ids     = [aws_security_group.client_vpn[0].id]
   server_certificate_arn = module.acm.acm_certificate_arn
-  split_tunnel = true
-  dns_servers= [
+  split_tunnel           = true
+  dns_servers = [
     "10.10.0.2"
   ]
 
   # Authentication (placeholder rules - adjust to least privilege)
   auth_rules = [
     {
-      cidr             = module.vpc.vpc_cidr_block
-      description      = "Allow access to entire VPC"
-      groups           = [var.client_vpn_sso_group_id]
+      cidr        = module.vpc.vpc_cidr_block
+      description = "Allow access to entire VPC"
+      groups      = [var.client_vpn_sso_group_id]
     }
   ]
 

@@ -2,18 +2,9 @@
 # Baserow helm chart
 ##############################################
 
-data "aws_secretsmanager_secret" "rds" {
-  arn = module.aurora.cluster_master_user_secret[0].secret_arn
-}
-
-data "aws_secretsmanager_secret_version" "rds" {
-  secret_id = data.aws_secretsmanager_secret.rds.id
-}
-
-
 resource "helm_release" "baserow" {
-  name       = "baserow"
-  namespace  = "my-baserow"
+  name      = "baserow"
+  namespace = "my-baserow"
 
   repository = "https://baserow.gitlab.io/baserow-chart/"
   chart      = "baserow"
@@ -35,7 +26,7 @@ resource "helm_release" "baserow" {
       s3_bucket_name      = module.s3_bucket.s3_bucket_id,
       s3_region_name      = var.region,
       s3_endpoint_url     = module.s3_bucket.s3_bucket_bucket_regional_domain_name,
-      eks_role_arn        = module.k8s-charts.baserow_backend_role_arn,
+      eks_role_arn        = module.k8s_charts.baserow_backend_role_arn,
       domain_name         = var.domain_name
       backend_domain_name = "api.${var.domain_name}"
       objects_domain_name = "objects.${var.domain_name}"
@@ -44,5 +35,5 @@ resource "helm_release" "baserow" {
       email_smtp_user     = aws_iam_access_key.baserow_smtp.id
       email_smtp_password = aws_iam_access_key.baserow_smtp.ses_smtp_password_v4
   })]
-  depends_on = [ module.k8s-charts ]
+  depends_on = [module.k8s_charts]
 }

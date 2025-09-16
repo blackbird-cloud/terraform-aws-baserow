@@ -107,7 +107,7 @@ resource "aws_iam_role_policy_attachment" "eks_alb_controller" {
 resource "aws_iam_policy" "eks_alb_controller" {
   name        = "${var.name}-eks-alb-controller-policy"
   description = "IAM policy for EKS ALB Controller to access AWS resources"
-  policy      = file("./policies/alb-controller-policy.json")
+  policy      = file("./k8s_charts/alb-controller-policy.json")
 }
 
 ##############################################
@@ -116,7 +116,7 @@ resource "aws_iam_policy" "eks_alb_controller" {
 resource "aws_iam_policy" "cluster_autoscaler" {
   name        = "${var.name}-cluster-autoscaler"
   description = "Policy for Kubernetes Cluster Autoscaler"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -173,28 +173,4 @@ resource "aws_iam_role" "cluster_autoscaler" {
 resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
   role       = aws_iam_role.cluster_autoscaler.name
   policy_arn = aws_iam_policy.cluster_autoscaler.arn
-}
-
-resource "helm_release" "cluster_autoscaler" {
-  name       = "cluster-autoscaler"
-  repository = "https://kubernetes.github.io/autoscaler"
-  chart      = "cluster-autoscaler"
-  version    = "9.50.1"
-  namespace  = "kube-system"
-
-  values = [templatefile("${path.module}/cluster_autoscaler_values.yaml", {
-    cluster_name        = var.cluster_name,
-    region              = var.region,
-    autoscaler_role_arn = aws_iam_role.cluster_autoscaler.arn
-  })]
-}
-
-output "cluster_autoscaler_iam_role_arn" {
-  value       = aws_iam_role.cluster_autoscaler.arn
-  description = "IAM role ARN for Kubernetes Cluster Autoscaler (use with IRSA in Helm deployment)"
-}
-
-output "cluster_autoscaler_helm_release_name" {
-  value       = helm_release.cluster_autoscaler.name
-  description = "Helm release name for the cluster autoscaler."
 }

@@ -1,5 +1,5 @@
 resource "postgresql_database" "baserow" {
-  name = "baserow"
+  name  = "baserow"
   owner = postgresql_role.baserow.name
   lifecycle {
     prevent_destroy = true
@@ -22,7 +22,7 @@ resource "postgresql_grant" "baserow_database" {
   role        = postgresql_role.baserow.name
   schema      = "public"
   object_type = "database"
-  privileges  = [
+  privileges = [
     "CONNECT",
     "CREATE",
     "TEMPORARY",
@@ -37,7 +37,7 @@ resource "postgresql_grant" "baserow_schema" {
   role        = postgresql_role.baserow.name
   schema      = "public"
   object_type = "schema"
-  privileges  = [
+  privileges = [
     "CREATE",
     "USAGE"
   ]
@@ -51,7 +51,7 @@ resource "postgresql_grant" "baserow_table" {
   role        = postgresql_role.baserow.name
   schema      = "public"
   object_type = "table"
-  privileges  = [
+  privileges = [
     "DELETE",
     "INSERT",
     "REFERENCES",
@@ -70,7 +70,7 @@ resource "postgresql_grant" "baserow_sequence" {
   role        = postgresql_role.baserow.name
   schema      = "public"
   object_type = "sequence"
-  privileges  = [
+  privileges = [
     "ALL"
   ]
   lifecycle {
@@ -83,7 +83,7 @@ resource "postgresql_grant" "baserow_function" {
   role        = postgresql_role.baserow.name
   schema      = "public"
   object_type = "function"
-  privileges  = [
+  privileges = [
     "ALL"
   ]
   lifecycle {

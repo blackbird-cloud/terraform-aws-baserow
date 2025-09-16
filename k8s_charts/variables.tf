@@ -56,12 +56,7 @@ variable "kms_valkey_arn" {
   type        = string
 }
 
-variable "db_password_arn" {
-  description = "Secrets Manager secret ARN for the baserow database password"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "EKS cluster name"
-  type        = string  
+  type        = string
 }

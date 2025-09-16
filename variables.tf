@@ -14,11 +14,11 @@ variable "region" {
   default     = "eu-central-1"
 }
 
-variable "whitelist_ips" {
-  description = "List of CIDR blocks to whitelist for access (e.g. your office IP)"
-  type        = list(string)
-  default     = ["185.54.181.106/32", "77.250.125.134/32"]
-}
+# variable "whitelist_ips" {
+#   description = "List of CIDR blocks to whitelist for access (e.g. your office IP)"
+#   type        = list(string)
+#   default     = ["185.54.181.106/32", "77.250.125.134/32"]
+# }
 
 variable "vpc_cidr" {
   description = "VPC CIDR block"
@@ -117,11 +117,11 @@ variable "db_instance_class" {
 #   default     = null
 # }
 
-variable "db_username" {
-  description = "Master DB username"
-  type        = string
-  default     = "baserow"
-}
+# variable "db_username" {
+#   description = "Master DB username"
+#   type        = string
+#   default     = "baserow"
+# }
 
 variable "valkey_node_type" {
   description = "Valkey / ElastiCache node type"
@@ -169,4 +169,12 @@ variable "client_vpn_sso_group_id" {
   description = "SSO group ID for Client VPN access"
   type        = string
   default     = "e3249852-c0a1-70c2-c87c-99436c0caa94"
+}
+
+
+# Replace with your verified domain or email
+variable "ses_identity" {
+  description = "SES identity (domain or email) to verify and use for sending."
+  type        = string
+  default     = "baserow-webinar.blackbird.cloud"
 }

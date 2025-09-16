@@ -38,7 +38,7 @@ resource "aws_kms_key" "s3" {
         "Sid" : "Allow the app to use the KMS key.",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : module.k8s-charts.baserow_backend_role_arn
+          "AWS" : module.k8s_charts.baserow_backend_role_arn
         },
         "Action" : [
           "kms:DescribeKey",
@@ -63,11 +63,11 @@ module "s3_bucket" {
   block_public_policy     = true
   block_public_acls       = true
   force_destroy           = false
-  acl    = "private"
+  acl                     = "private"
 
   control_object_ownership = true
   object_ownership         = "ObjectWriter"
-  
+
   tags = var.tags
 
   server_side_encryption_configuration = {

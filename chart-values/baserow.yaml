@@ -55,6 +55,7 @@ ingress:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/wafv2-acl-arn: "${waf_acl_arn}"
 
 caddy:
   enabled: false
@@ -67,17 +68,3 @@ postgresql:
 
 minio:
   enabled: false
-
-keda:
-  enabled: false
-  scaling:
-    export:
-      enabled: true
-      queueName: "export"
-      queueLength: 10
-      activationLength: 1
-    worker:
-      enabled: true
-      queueName: "celery"
-      queueLength: 10
-      activationLength: 1

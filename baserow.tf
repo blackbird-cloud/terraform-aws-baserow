@@ -34,6 +34,7 @@ resource "helm_release" "baserow" {
       email_smtp_host     = "email-smtp.eu-central-1.amazonaws.com"
       email_smtp_user     = aws_iam_access_key.baserow_smtp.id
       email_smtp_password = aws_iam_access_key.baserow_smtp.ses_smtp_password_v4
+      waf_acl_arn         = module.waf.arn
   })]
   depends_on = [module.k8s_charts]
 }

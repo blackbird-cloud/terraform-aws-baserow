@@ -104,10 +104,14 @@ resource "aws_iam_role_policy_attachment" "eks_alb_controller" {
   policy_arn = aws_iam_policy.eks_alb_controller.arn
 }
 
+data "local_file" "eks_alb_controller_policy" {
+  filename = "k8s_charts/alb-controller-policy.json"
+}
+
 resource "aws_iam_policy" "eks_alb_controller" {
   name        = "${var.name}-eks-alb-controller-policy"
   description = "IAM policy for EKS ALB Controller to access AWS resources"
-  policy      = file("./k8s_charts/alb-controller-policy.json")
+  policy      = data.local_file.eks_alb_controller_policy.content
 }
 
 ##############################################

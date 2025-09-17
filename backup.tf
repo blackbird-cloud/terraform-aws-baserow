@@ -1,14 +1,10 @@
-
-
 module "backup" {
-  # source  = "blackbird-cloud/backup/aws"
-  # version = "~> 1.1.0"
-  source = "../modules/terraform-aws-backup"
+  source  = "blackbird-cloud/backup/aws"
+  version = "~> 1.2.0"
 
-  name                       = "centralized-backup"
-  kms_key_arn                = aws_kms_key.backup.arn
-  create_backup_plan         = true
-  create_backup_vault_policy = true
+  name               = "centralized-backup"
+  kms_key_arn        = aws_kms_key.backup.arn
+  create_backup_plan = true
   resource_type_opt_in_preference = {
     "Aurora" : true,
     "EBS" : true,

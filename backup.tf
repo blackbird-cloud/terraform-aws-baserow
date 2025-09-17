@@ -6,6 +6,18 @@ module "backup" {
   kms_key_arn        = aws_kms_key.backup.arn
   create_backup_plan = true
   resource_type_opt_in_preference = {
+    "CloudFormation" : true,
+    "DocumentDB" : true,
+    "DynamoDB" : true,
+    "EFS" : true,
+    "FSx" : true,
+    "Neptune" : true,
+    "Redshift" : true,
+    "Redshift Serverless" : true,
+    "SAP HANA on Amazon EC2" : true,
+    "Storage Gateway" : true,
+    "Timestream" : true,
+    "VirtualMachine" : true,
     "Aurora" : true,
     "EBS" : true,
     "EC2" : true,

@@ -52,7 +52,14 @@ resource "postgresql_grant" "baserow_table" {
   schema      = "public"
   object_type = "table"
   privileges = [
-    "ALL"
+    "DELETE",
+    "INSERT",
+    "MAINTAIN",
+    "REFERENCES",
+    "SELECT",
+    "TRIGGER",
+    "TRUNCATE",
+    "UPDATE"
   ]
   lifecycle {
     prevent_destroy = true

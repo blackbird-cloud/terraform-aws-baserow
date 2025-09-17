@@ -16,10 +16,9 @@ module "backup" {
   selection = {
     create_default_role = true
     condition = {
-      string_equals = [{
-        key   = "aws:ResourceTag/Backup"
-        value = "true"
-      }]
+      string_equals = {
+        "aws:ResourceTag/Backup" = "true"
+      }
     }
     resources = ["*"]
   }
@@ -44,11 +43,10 @@ module "backup" {
         "Effect": "Allow",
         "Action": "backup:CopyIntoBackupVault",
         "Resource": "*",
-        "Principal": "*",
-        "Condition": {
-          "StringEquals": {
-            "aws:AccountId": "${data.aws_caller_identity.current.account_id}"
-          }
+        "Principal": {
+            "AWS": [
+                "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+            ]
         }
       }
   ]

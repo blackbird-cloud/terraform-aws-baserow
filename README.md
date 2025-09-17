@@ -43,6 +43,7 @@ The module can be configured using the following variables:
 | [aws_iam_access_key.baserow_smtp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_user.baserow_smtp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy.baserow_smtp_send](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
+| [aws_kms_key.backup](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key.valkey](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
@@ -57,6 +58,8 @@ The module can be configured using the following variables:
 | [aws_sesv2_email_identity.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sesv2_email_identity) | resource |
 | [aws_sesv2_email_identity_policy.smtp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sesv2_email_identity_policy) | resource |
 | [helm_release.baserow](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.metrics_server](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.opentelemetry](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [postgresql_database.baserow](https://registry.terraform.io/providers/cyrilgdn/postgresql/1.26.0/docs/resources/database) | resource |
 | [postgresql_grant.baserow_database](https://registry.terraform.io/providers/cyrilgdn/postgresql/1.26.0/docs/resources/grant) | resource |
 | [postgresql_grant.baserow_function](https://registry.terraform.io/providers/cyrilgdn/postgresql/1.26.0/docs/resources/grant) | resource |
@@ -151,7 +154,7 @@ Project: main
  └─ Performance Insights API                                                                                                                         Monthly cost depends on usage: $0.01 per 1000 requests
 
  module.eks.module.eks_managed_node_group["spot"].aws_eks_node_group.this[0]
- └─ Instance usage (Linux/UNIX, spot, t3.xlarge)                                                                                                                   730  hours                         $55.92
+ └─ Instance usage (Linux/UNIX, spot, t3.xlarge)                                                                                                                   730  hours                         $56.06
 
  module.valkey.aws_elasticache_replication_group.this[0]
  └─ ElastiCache (on-demand, cache.t4g.small)                                                                                                                     1,460  hours                         $42.05
@@ -170,6 +173,12 @@ Project: main
  module.waf.aws_wafv2_web_acl.default[0]
  ├─ Web ACL usage                                                                                                                                                    1  months                         $5.00
  └─ Requests                                                                                                                                         Monthly cost depends on usage: $0.60 per 1M requests
+
+ aws_kms_key.backup
+ ├─ Customer master key                                                                                                                                              1  months                         $1.00
+ ├─ Requests                                                                                                                                         Monthly cost depends on usage: $0.03 per 10k requests
+ ├─ ECC GenerateDataKeyPair requests                                                                                                                 Monthly cost depends on usage: $0.10 per 10k requests
+ └─ RSA GenerateDataKeyPair requests                                                                                                                 Monthly cost depends on usage: $0.10 per 10k requests
 
  aws_kms_key.rds
  ├─ Customer master key                                                                                                                                              1  months                         $1.00
@@ -239,6 +248,20 @@ Project: main
  ├─ Backup storage                                                                                                                                   Monthly cost depends on usage: $0.023 per GB
  └─ Snapshot export                                                                                                                                  Monthly cost depends on usage: $0.011 per GB
 
+ module.backup.aws_backup_vault.vault
+ ├─ EFS backup (warm)                                                                                                                                Monthly cost depends on usage: $0.06 per GB
+ ├─ EFS backup (cold)                                                                                                                                Monthly cost depends on usage: $0.012 per GB
+ ├─ EFS restore (warm)                                                                                                                               Monthly cost depends on usage: $0.024 per GB
+ ├─ EFS restore (cold)                                                                                                                               Monthly cost depends on usage: $0.036 per GB
+ ├─ EFS restore (item-level)                                                                                                                         Monthly cost depends on usage: $0.60 per requests
+ ├─ EBS snapshot                                                                                                                                     Monthly cost depends on usage: $0.054 per GB
+ ├─ RDS snapshot                                                                                                                                     Monthly cost depends on usage: $0.10 per GB
+ ├─ DynamoDB backup                                                                                                                                  Monthly cost depends on usage: $0.12 per GB
+ ├─ DynamoDB restore                                                                                                                                 Monthly cost depends on usage: $0.18 per GB
+ ├─ Aurora snapshot                                                                                                                                  Monthly cost depends on usage: $0.023 per GB
+ ├─ FSx for Windows backup                                                                                                                           Monthly cost depends on usage: $0.054 per GB
+ └─ FSx for Lustre backup                                                                                                                            Monthly cost depends on usage: $0.054 per GB
+
  module.eks.aws_cloudwatch_log_group.this[0]
  ├─ Data ingested                                                                                                                                    Monthly cost depends on usage: $0.63 per GB
  ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
@@ -257,20 +280,20 @@ Project: main
  ├─ Archival Storage                                                                                                                                 Monthly cost depends on usage: $0.0324 per GB
  └─ Insights queries data scanned                                                                                                                    Monthly cost depends on usage: $0.0063 per GB
 
- OVERALL TOTAL                                                                                                                                                                                      $703.15
+ OVERALL TOTAL                                                                                                                                                                                      $704.29
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-150 cloud resources were detected:
-∙ 28 were estimated
-∙ 121 were free
+158 cloud resources were detected:
+∙ 30 were estimated
+∙ 127 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $703 ┃           - ┃       $703 ┃
+┃ main                                               ┃          $704 ┃           - ┃       $704 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 ```
 Update with

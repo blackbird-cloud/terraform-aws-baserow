@@ -41,7 +41,9 @@ module "valkey" {
     }
   ]
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Backup = "true"
+  })
 }
 
 resource "random_password" "valkey" {

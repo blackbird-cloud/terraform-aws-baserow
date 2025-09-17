@@ -58,7 +58,9 @@ module "aurora" {
   apply_immediately   = true
   skip_final_snapshot = true
   deletion_protection = false
-  tags                = var.tags
+  tags = merge(var.tags, {
+    Backup = "true"
+  })
 }
 
 resource "aws_kms_key" "rds" {

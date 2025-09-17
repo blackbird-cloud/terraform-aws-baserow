@@ -52,12 +52,16 @@ backendConfigMap:
   OTEL_PER_MODULE_SAMPLER_OVERRIDES: "opentelemetry.instrumentation.celery=opentelemetry.instrumentation.django=always_on"
   OTEL_TRACES_SAMPLER: "traceidratio"
   OTEL_TRACES_SAMPLER_ARG:  "0.05"
-  BASEROW_AMOUNT_OF_GUNICORN_WORKERS: 3
-  BASEROW_AMOUNT_OF_WORKERS: 3
   SENTRY_DSN: https://900451afbf14c6b0da0d78f3565c7a64@o4510030028537856.ingest.de.sentry.io/4510030030635088
   # Analytics
   POSTHOG_PROJECT_API_KEY: ""
   POSTHOG_HOST: ""
+  # Resources
+  BASEROW_AMOUNT_OF_GUNICORN_WORKERS: 3
+  BASEROW_AMOUNT_OF_WORKERS: 3
+
+frontendConfigMap:
+  SENTRY_DSN: https://1d954a62b6bc0606d6de3f3c327b9563@o4510030028537856.ingest.de.sentry.io/4510035302678608
 
 baserow-backend-wsgi:
   tolerations: ${tolerations}

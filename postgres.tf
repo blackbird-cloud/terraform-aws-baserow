@@ -54,7 +54,6 @@ resource "postgresql_grant" "baserow_table" {
   privileges = [
     "DELETE",
     "INSERT",
-    "MAINTAIN",
     "REFERENCES",
     "SELECT",
     "TRIGGER",

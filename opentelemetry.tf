@@ -53,14 +53,20 @@ resource "helm_release" "opentelemetry" {
           otlp = {
             endpoint = "api.honeycomb.io:443"
             headers = {
-              "x-honeycomb-team" = join("", ["$$", "{env:HONEYCOMB_API_KEY}"])
+              "x-honeycomb-team" = join("", ["$", "{env:HONEYCOMB_API_KEY}"])
+            }
+            tls = {
+              insecure = false
             }
           }
           "otlp/metrics" = {
             endpoint = "api.honeycomb.io:443"
             headers = {
-              "x-honeycomb-dataset" = join("", ["$$", "{env:HONEYCOMB_API_KEY}"])
-              "x-honeycomb-team"    = "baserow-metrics"
+              "x-honeycomb-dataset" = join("", ["$", "{env:HONEYCOMB_API_KEY}"])
+              "x-honeycomb-team"    = "mKk7ddDO0CefuxQvBieeePB"
+            }
+            tls = {
+              insecure = false
             }
           }
         }

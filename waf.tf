@@ -24,9 +24,9 @@ module "waf" {
 
   managed_rule_group_statement_rules = [
     {
-      name                     = "AWS-AWSManagedRulesAdminProtectionRuleSet"
-      priority                 = 1
-      override_override_action = "count"
+      name            = "AWS-AWSManagedRulesAdminProtectionRuleSet"
+      priority        = 1
+      override_action = "count"
 
       statement = {
         name        = "AWSManagedRulesAdminProtectionRuleSet"
